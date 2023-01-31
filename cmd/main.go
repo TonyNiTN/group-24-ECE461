@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"group-24-ECE461/internal"
-);
+	"group-24-ECE461/internal/logger"
+)
 
 func main() {
-	logger, err := utils.InitLogger()
+	logger, err := logger.InitLogger()
 	if err != nil {
-		fmt.Println("Could not init logger", err)
+		fmt.Println(err)
 		return
 	}
 	defer logger.Sync()
 
 	logger.Info("Starting Application")
-	fmt.Println("hello world!");
+	fmt.Println("hello world!")
 }
