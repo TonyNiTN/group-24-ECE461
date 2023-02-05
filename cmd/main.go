@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"group-24-ECE461/internal/error"
 	"group-24-ECE461/internal/logger"
+	"group-24-ECE461/internal/parser"
+	"os"
 )
 
 func main() {
+
 	logger, err := logger.InitLogger()
 	if err != nil {
 		fmt.Println(err)
@@ -20,4 +23,7 @@ func main() {
 
 	logger.Info("Starting Application")
 	fmt.Println("hello world!")
+
+	argsWithProg := os.Args[1:]
+	parser.ParseArguments(argsWithProg)
 }
