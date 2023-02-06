@@ -7,10 +7,13 @@ import (
 	"group-24-ECE461/internal/helper"
 	"group-24-ECE461/internal/logger"
 	"group-24-ECE461/internal/models"
+	"group-24-ECE461/internal/parser"
 	"group-24-ECE461/internal/scorer"
+	"os"
 )
 
 func main() {
+
 	logger, err := logger.InitLogger()
 	if err != nil {
 		fmt.Println(err)
@@ -39,4 +42,8 @@ func main() {
 		repos = append(repos, repo)
 	}
 	//helper.DisplayResults(repos)
+	fmt.Println("hello world!")
+
+	argsWithProg := os.Args[1:]
+	parser.ParseArguments(argsWithProg)
 }
