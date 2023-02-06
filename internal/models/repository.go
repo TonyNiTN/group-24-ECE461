@@ -30,3 +30,11 @@ var Weights = map[string]float64{
 	"Responsiveness":        2.0,
 	"License Compatibility": 2.0,
 }
+
+var Repos = map[string]string{
+	"expressjs": "express",
+	"nodejs":    "node",
+	"facebook":  "react",
+	"vuejs":     "vue",
+	"yargs":     "yargs",
+}

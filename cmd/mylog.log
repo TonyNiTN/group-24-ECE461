@@ -1,0 +1,37 @@
+{"level":"INFO","ts":"2023-02-06 15:49:40","caller":"cmd/main.go:23","msg":"GraphQL error: query failed (path: query.getUser)"}
+{"level":"INFO","ts":"2023-02-06 15:49:40","caller":"cmd/main.go:25","msg":"Starting Application"}
+{"level":"INFO","ts":"2023-02-06 15:49:40","caller":"api/api.go:183","msg":"Success -- Stargazers"}
+{"level":"INFO","ts":"2023-02-06 15:49:41","caller":"api/api.go:195","msg":"Success -- Readme"}
+{"level":"INFO","ts":"2023-02-06 15:49:41","caller":"api/api.go:165","msg":"Success -- License"}
+{"level":"INFO","ts":"2023-02-06 15:49:41","caller":"api/api.go:103","msg":"Success -- Pull requests"}
+{"level":"INFO","ts":"2023-02-06 15:49:41","caller":"api/api.go:118","msg":"Success -- Issues"}
+{"level":"INFO","ts":"2023-02-06 15:49:42","caller":"api/api.go:149","msg":"Success -- Contributors"}
+{"level":"INFO","ts":"2023-02-06 15:49:42","caller":"api/api.go:135","msg":"Success -- Commits"}
+{"level":"INFO","ts":"2023-02-06 15:49:42","caller":"api/api.go:183","msg":"Success -- Stargazers"}
+{"level":"INFO","ts":"2023-02-06 15:49:42","caller":"api/api.go:195","msg":"Success -- Readme"}
+{"level":"INFO","ts":"2023-02-06 15:49:42","caller":"api/api.go:165","msg":"Success -- License"}
+{"level":"INFO","ts":"2023-02-06 15:49:43","caller":"api/api.go:103","msg":"Success -- Pull requests"}
+{"level":"INFO","ts":"2023-02-06 15:49:44","caller":"api/api.go:118","msg":"Success -- Issues"}
+{"level":"INFO","ts":"2023-02-06 15:49:45","caller":"api/api.go:149","msg":"Success -- Contributors"}
+{"level":"INFO","ts":"2023-02-06 15:49:45","caller":"api/api.go:135","msg":"Success -- Commits"}
+{"level":"INFO","ts":"2023-02-06 15:49:45","caller":"api/api.go:183","msg":"Success -- Stargazers"}
+{"level":"INFO","ts":"2023-02-06 15:49:46","caller":"api/api.go:195","msg":"Success -- Readme"}
+{"level":"INFO","ts":"2023-02-06 15:49:46","caller":"api/api.go:165","msg":"Success -- License"}
+{"level":"INFO","ts":"2023-02-06 15:49:47","caller":"api/api.go:103","msg":"Success -- Pull requests"}
+{"level":"INFO","ts":"2023-02-06 15:49:48","caller":"api/api.go:118","msg":"Success -- Issues"}
+{"level":"INFO","ts":"2023-02-06 15:49:48","caller":"api/api.go:149","msg":"Success -- Contributors"}
+{"level":"INFO","ts":"2023-02-06 15:49:48","caller":"api/api.go:135","msg":"Success -- Commits"}
+{"level":"INFO","ts":"2023-02-06 15:49:48","caller":"api/api.go:183","msg":"Success -- Stargazers"}
+{"level":"INFO","ts":"2023-02-06 15:49:48","caller":"api/api.go:195","msg":"Success -- Readme"}
+{"level":"INFO","ts":"2023-02-06 15:49:49","caller":"api/api.go:165","msg":"Success -- License"}
+{"level":"INFO","ts":"2023-02-06 15:49:50","caller":"api/api.go:103","msg":"Success -- Pull requests"}
+{"level":"INFO","ts":"2023-02-06 15:49:51","caller":"api/api.go:118","msg":"Success -- Issues"}
+{"level":"INFO","ts":"2023-02-06 15:49:51","caller":"api/api.go:149","msg":"Success -- Contributors"}
+{"level":"INFO","ts":"2023-02-06 15:49:52","caller":"api/api.go:135","msg":"Success -- Commits"}
+{"level":"INFO","ts":"2023-02-06 15:49:52","caller":"api/api.go:183","msg":"Success -- Stargazers"}
+{"level":"INFO","ts":"2023-02-06 15:49:52","caller":"api/api.go:195","msg":"Success -- Readme"}
+{"level":"INFO","ts":"2023-02-06 15:49:52","caller":"api/api.go:165","msg":"Success -- License"}
+{"level":"INFO","ts":"2023-02-06 15:49:52","caller":"api/api.go:103","msg":"Success -- Pull requests"}
+{"level":"INFO","ts":"2023-02-06 15:49:53","caller":"api/api.go:118","msg":"Success -- Issues"}
+{"level":"INFO","ts":"2023-02-06 15:49:53","caller":"api/api.go:149","msg":"Success -- Contributors"}
+{"level":"INFO","ts":"2023-02-06 15:49:53","caller":"api/api.go:135","msg":"Success -- Commits"}
