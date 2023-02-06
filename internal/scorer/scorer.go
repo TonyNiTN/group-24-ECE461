@@ -28,7 +28,7 @@ func CalculateNetScore(repo *models.Repository) {
 		(repo.BusFactorScore * models.Weights["Bus Factor"] * -1.0) + (repo.ResponsivenessScore * models.Weights["Responsiveness"]) +
 		(repo.LicenseCompatibilityScore * models.Weights["License Compatibility"])
 	repo.NetScore = netScore
-	repo.NetPercentage = (netScore / float64(5)) * float64(100)
+	repo.NetPercentage = (netScore / float64(8)) * float64(100)
 }
 
 func CalculateRampUpTime(repo *models.Repository) {
@@ -67,7 +67,7 @@ func CalculateCorrectness(repo *models.Repository) {
 
 func CalculateBusFactor(repo *models.Repository) {
 	score := float64(repo.TopContributions) / float64(repo.Commits)
-	if score > 1 {
+	if score > 1 || repo.Commits == 0.0 {
 		score = 1.0
 	}
 
@@ -76,7 +76,7 @@ func CalculateBusFactor(repo *models.Repository) {
 
 func CalculateResponsiveness(repo *models.Repository) {
 	score := float64(repo.OpenPRs) / float64(repo.OpenIssues)
-	if score > 1 {
+	if score > 1 || repo.OpenIssues == 0.0 {
 		score = 1.0
 	}
 

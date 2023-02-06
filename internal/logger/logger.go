@@ -16,7 +16,7 @@ func InitLogger() (*zap.Logger, error) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	logFile := os.Getenv("LOG_FILE")
 
-	fmt.Println(logFile)
+	//fmt.Println(logFile)
 
 	// Check LOG_PATH is not empty
 	if logFile == "" {
@@ -45,7 +45,7 @@ func InitLogger() (*zap.Logger, error) {
 	case "2":
 		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 	default:
-		config.Level = zap.NewAtomicLevelAt(zapcore.FatalLevel + 1)
+		config.Level = zap.NewAtomicLevelAt(zap.FatalLevel + 1)
 	}
 
 	// Set output file
