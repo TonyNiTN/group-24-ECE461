@@ -6,11 +6,14 @@ import (
 	"group-24-ECE461/internal/cli"
 	"os"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
-func ParseArguments(argsWithProg []string) (e error) {
-	if strings.Contains(argsWithProg[0], "/") {
-		file, err := os.Open(argsWithProg[0])
+func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
+	arg := argsWithProg[0]
+	if strings.Contains(arg, "\\") {
+		file, err := os.Open(arg)
 		if err != nil {
 			fmt.Println("Error opening URL file:", err)
 			return err
@@ -18,6 +21,7 @@ func ParseArguments(argsWithProg []string) (e error) {
 		defer file.Close()
 		var lines []string
 		scanner := bufio.NewScanner(file)
+
 		for scanner.Scan() {
 			line := strings.TrimRight(scanner.Text(), "\n")
 			lines = append(lines, line)
@@ -26,7 +30,7 @@ func ParseArguments(argsWithProg []string) (e error) {
 			fmt.Println("Error reading URL file:", err)
 			return err
 		}
-		cli.Score(lines)
+		cli.Score(lines, logger)
 		return nil
 	}
 
@@ -35,11 +39,11 @@ func ParseArguments(argsWithProg []string) (e error) {
 	}
 
 	if argsWithProg[0] == "build" {
-		cli.Build()
+		cli.Build(logger)
 	}
 
 	if argsWithProg[0] == "install" {
-		cli.Install()
+		cli.Install(logger)
 	}
 
 	return nil
