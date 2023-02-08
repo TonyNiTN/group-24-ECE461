@@ -1,9 +1,7 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
-	"group-24-ECE461/internal/logger"
 	"sort"
 )
 
@@ -36,18 +34,6 @@ var Weights = map[string]float64{
 	"Bus Factor":            3.0,
 	"Responsiveness":        2.0,
 	"License Compatibility": 2.0,
-}
-
-func PrintRepo(repo *Repository) { // function to print the fields of a repository in json format
-	b, err := json.MarshalIndent(repo, "", " ")
-	if err != nil {
-		logger, _ := logger.InitLogger()
-		logger.Error("Error printing repository")
-		fmt.Println(err)
-		return
-	} else {
-		fmt.Print(string(b))
-	}
 }
 
 func SortRepositories(repos []*Repository) []*Repository {

@@ -35,7 +35,7 @@ func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
 	}
 
 	if argsWithProg[0] == "test" {
-		cli.Test()
+		cli.Test(logger)
 	}
 
 	if argsWithProg[0] == "build" {
