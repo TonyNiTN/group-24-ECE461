@@ -55,6 +55,13 @@ func Build(logger *zap.Logger) {
 	}
 }
 
-func Test() {
+func Test(logger *zap.Logger) {
 	fmt.Println("Testing.....")
+	cmd := exec.Command("go", "test", "./...", "-cover")
+	err := cmd.Run()
+	if err != nil {
+		logger.Debug("Error running tests!")
+		fmt.Println("Error running tests:", err)
+		return
+	}
 }

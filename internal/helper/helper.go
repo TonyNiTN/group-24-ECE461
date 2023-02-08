@@ -28,21 +28,17 @@ func GetTopFiveContributions(contr []*github.Contributor) int { // function to g
 	sort.Slice(contr, func(i, j int) bool {
 		return *contr[i].Contributions > *contr[j].Contributions
 	})
+	var topFive []*github.Contributor
+	if len(contr) > 5 {
+		topFive = contr[:5]
+	} else {
+		topFive = contr
+	}
 
-	topFive := contr[:5]
 	var sum int
 	for _, c := range topFive {
 		sum += *c.Contributions
 	}
-	return sum
-}
-
-func CountCommits(commits []*github.RepositoryCommit) int { // function to count the number of commits in a single page of response. Returns the count as an integer.
-	var sum int
-	for i := range commits {
-		sum = i + 1
-	}
-
 	return sum
 }
 
