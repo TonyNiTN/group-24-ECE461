@@ -14,7 +14,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	newError := error.NewGraphQLError("query failed", "query.getUser")
+	newError := error.NotFoundError("GraphQL", "stars")
 
 	logger.Info(newError.Error())
 

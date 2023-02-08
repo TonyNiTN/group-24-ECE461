@@ -2,20 +2,35 @@ package error
 
 import "fmt"
 
-// GraphQLError represents a custom error class for GraphQL errors
-type GraphQLError struct {
+// Create base error class for sending requests
+type RequestError struct {
+	// HTTP status code
+	Statuscode int
+
+	// Error message
 	Message string
-	Path    string
 }
 
-func (e *GraphQLError) Error() string {
-	return fmt.Sprintf("GraphQL error: %s (path: %s)", e.Message, e.Path)
+// Create Error string
+func (re *RequestError) Error() string {
+	return re.Message
 }
 
-// NewGraphQLError creates a new instance of GraphQLError
-func NewGraphQLError(message, path string) *GraphQLError {
-	return &GraphQLError{
-		Message: message,
-		Path:    path,
+// Bad Request Error
+func BadRequestError(requestType string, errorMessage string) *RequestError {
+	return &RequestError{
+		Statuscode: 400,
+		Message:    fmt.Sprintf("%s Error: Bad request: %s", requestType, errorMessage),
 	}
 }
+
+// Not Found Error
+func NotFoundError(requestType string, query string) *RequestError {
+	return &RequestError{
+		Statuscode: 404,
+		Message:    fmt.Sprintf("%s Error: could not find: %s", requestType, query),
+	}
+}
+
+
+
