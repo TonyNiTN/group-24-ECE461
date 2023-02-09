@@ -2,20 +2,51 @@ package error
 
 import "fmt"
 
-// GraphQLError represents a custom error class for GraphQL errors
-type GraphQLError struct {
+// Create base error class for sending requests.
+type RequestError struct {
+	// HTTP status code.
+	StatusCode int
+
+	// Error message.
 	Message string
-	Path    string
+
+	// Type of HTTP request.
+	RequestType string
 }
 
-func (e *GraphQLError) Error() string {
-	return fmt.Sprintf("GraphQL error: %s (path: %s)", e.Message, e.Path)
+// Create Error string.
+func (re *RequestError) Error() string {
+	return fmt.Sprintf("Status Code: %d, Request Type: %s, Error Message: %s", re.StatusCode, re.RequestType, re.Message)
 }
 
-// NewGraphQLError creates a new instance of GraphQLError
-func NewGraphQLError(message, path string) *GraphQLError {
-	return &GraphQLError{
-		Message: message,
-		Path:    path,
+// Create a Request Error struct.
+func NewRequestError(requestType string, errorMessage string, statusCode int) *RequestError {
+	return &RequestError{
+		StatusCode:  statusCode,
+		Message:     errorMessage,
+		RequestType: requestType,
+	}
+}
+
+// Create base error for general error within codebase.
+type GeneralError struct {
+
+	// Function error appeared in.
+	Function string
+
+	// Error message.
+	Message string
+}
+
+// Create Error string.
+func (ge *GeneralError) Error() string {
+	return fmt.Sprintf("Error in Function: %s, Error Message: %s", ge.Function, ge.Message)
+}
+
+// Create a General Error struct.
+func NewGeneralError(function string, errorMessage string) *GeneralError {
+	return &GeneralError{
+		Function: function,
+		Message:  errorMessage,
 	}
 }
