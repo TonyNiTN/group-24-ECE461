@@ -14,10 +14,11 @@ func main() {
 	}
 	defer logger.Sync()
 
-	newError := error.NotFoundError("GraphQL", "stars")
+	infoError := error.NewRequestError("GraphQL", "Error", 400)
+	logger.Info(infoError.Error())
 
-	logger.Info(newError.Error())
+	logger.Debug("debug")
 
-	logger.Info("Starting Application")
+	logger.Debug("Starting Application")
 	fmt.Println("hello world!")
 }

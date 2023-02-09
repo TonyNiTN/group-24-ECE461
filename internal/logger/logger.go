@@ -41,9 +41,9 @@ func InitLogger() (*zap.Logger, error) {
 	// Set log level
 	switch logLevel {
 	case "1":
-		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
-	case "2":
 		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	case "2":
+		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	default:
 		config.Level = zap.NewAtomicLevelAt(zapcore.FatalLevel + 1)
 	}
