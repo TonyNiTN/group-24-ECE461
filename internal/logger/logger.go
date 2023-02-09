@@ -16,7 +16,7 @@ func InitLogger() (*zap.Logger, error) {
 	logLevel := os.Getenv("LOG_LEVEL")
 	logFile := os.Getenv("LOG_FILE")
 
-	fmt.Println(logFile)
+	//fmt.Println(logFile)
 
 	// Check LOG_PATH is not empty
 	if logFile == "" {

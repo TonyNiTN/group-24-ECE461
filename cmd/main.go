@@ -2,23 +2,23 @@ package main
 
 import (
 	"fmt"
-	"group-24-ECE461/internal/error"
 	"group-24-ECE461/internal/logger"
+	"group-24-ECE461/internal/parser"
+	"os"
 )
 
 func main() {
+
 	logger, err := logger.InitLogger()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer logger.Sync()
+	//defer logger.Sync()
 
-	infoError := error.NewRequestError("GraphQL", "Error", 400)
-	logger.Info(infoError.Error())
-
-	logger.Debug("debug")
-
-	logger.Debug("Starting Application")
-	fmt.Println("hello world!")
+	logger.Info("Starting Application")
+	fmt.Println("Starting Application")
+	argsWithProg := os.Args[0:]
+	fmt.Println(argsWithProg)
+	parser.ParseArguments(argsWithProg, logger)
 }
