@@ -174,7 +174,6 @@ func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Reposit
 		logger.Debug(newError.Error())
 		return
 	}
-	fmt.Println("success")
 	logger.Info("Success -- Stargazers")
 	repo.StarsCount = models.Stars.Repository.StargazerCount // populate repository field
 

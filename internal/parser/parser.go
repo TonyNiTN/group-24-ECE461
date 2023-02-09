@@ -10,8 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
-	arg := argsWithProg[0]
+func ParseArguments(argsWithOutProg []string, logger *zap.Logger) (e error) {
+	arg := argsWithOutProg[0]
 	if strings.Contains(arg, "\\") {
 		file, err := os.Open(arg)
 		if err != nil {
@@ -34,15 +34,15 @@ func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
 		return nil
 	}
 
-	if argsWithProg[0] == "test" {
+	if argsWithOutProg[0] == "test" {
 		cli.Test(logger)
 	}
 
-	if argsWithProg[0] == "build" {
+	if argsWithOutProg[0] == "build" {
 		cli.Build(logger)
 	}
 
-	if argsWithProg[0] == "install" {
+	if argsWithOutProg[0] == "install" {
 		cli.Install(logger)
 	}
 

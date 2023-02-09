@@ -84,12 +84,14 @@ func CalculateResponsiveness(repo *models.Repository) {
 }
 
 func CalculateLicenseCompatibility(repo *models.Repository) {
-	var score float64
-	res, _ := regexp.MatchString(`(?i)lesser general public\b`, repo.License)
-	if res {
-		score = 1.0
-	} else {
-		score = 0.0
+	var score float64 = 0.0
+
+	for _, l := range models.Licenses {
+		re := regexp.MustCompile(`\b` + l + `\b`)
+		if re.MatchString(repo.Readme) {
+			score = 1.0
+			break
+		}
 	}
 
 	repo.LicenseCompatibilityScore = score

@@ -24,8 +24,6 @@ func Install(logger *zap.Logger) {
 
 func Score(urlLinks []string, logger *zap.Logger) {
 	fmt.Println("Scoring.....")
-	fmt.Println(urlLinks)
-
 	var repos []*models.Repository
 	client, ctx := api.CreateRESTClient()
 	graphqlClient, graphqlCtx := api.CreateGQLClient()
