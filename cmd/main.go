@@ -18,7 +18,7 @@ func main() {
 
 	logger.Info("Starting Application")
 	fmt.Println("Starting Application")
-	argsWithProg := os.Args[0:]
-	fmt.Println(argsWithProg)
+	argsWithProg := os.Args[1:]
+	//fmt.Println(argsWithProg)
 	parser.ParseArguments(argsWithProg, logger)
 }

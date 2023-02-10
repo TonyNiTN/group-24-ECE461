@@ -12,7 +12,7 @@ import (
 
 func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
 	arg := argsWithProg[0]
-	if strings.Contains(arg, "\\") {
+	if strings.Contains(arg, "/") {
 		file, err := os.Open(arg)
 		if err != nil {
 			fmt.Println("Error opening URL file:", err)
