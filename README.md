@@ -5,7 +5,7 @@ Group 24's implementation of a package rater written in Golang for ECE 461.
 Group:
 
 - Tony Ni @ ni86@purdue.edu
-- Yigitkan Balci @ yblaci@purdue.edu
+- Yigitkan Balci @ ybalci@purdue.edu
 - Varun Dengi @ vdengi@purdue.edu
 
 # **Components**
