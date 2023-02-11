@@ -14,7 +14,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	//defer logger.Sync()
+	defer logger.Sync()
 
 	logger.Info("Starting Application")
 	fmt.Println("Starting Application")
