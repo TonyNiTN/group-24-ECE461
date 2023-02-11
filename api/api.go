@@ -27,14 +27,35 @@ import (
 //Bus Factor: Total commits, and top 5 contributors ;; using REST API
 //Responsiveness: pull requests in the last week to open issues in the last week ;; using REST API
 //License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
-
-func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger) {
+var flag int = 0
+func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger) (f int) {
+	flag = 0
 	GetStars(graphqlClient, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
 	GetReadme(client, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
 	GetPullRequests(client, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
 	GetIssues(client, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
 	GetContributors(client, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
 	GetCommits(client, ctx, repo, logger)
+	if flag == 1 {
+		return flag
+	}
+
+	return flag
 }
 
 func GetRepoOwnerFromNPM(pack string) string {
@@ -91,11 +112,12 @@ func CreateGQLClient() (*githubv4.Client, context.Context) { // function to crea
 	return graphqlClient, ctx                                                   // returns the github graphql api client and the empty context
 }
 
-func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get request for pull requests
+func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) () { // function to make get request for pull requests
 	since := helper.GetLastWeek()                                                              // get date to filter results by
 	s := fmt.Sprintf("org:%s repo:%s created:>%s is:pr is:open", repo.Owner, repo.Name, since) // create query string
 	prs, response, err := client.Search.Issues(ctx, s, &github.SearchOptions{})                // make the request
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())
@@ -112,6 +134,7 @@ func GetIssues(client *github.Client, ctx context.Context, repo *models.Reposito
 	s := fmt.Sprintf("org:%s repo:%s created:>%s is:pr is:open", repo.Owner, repo.Name, since) // create query string
 	issues, response, err := client.Search.Issues(ctx, s, &github.SearchOptions{})             // make the request
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())
@@ -129,6 +152,7 @@ func GetCommits(client *github.Client, ctx context.Context, repo *models.Reposit
 
 	_, response, err := client.Repositories.ListCommits(ctx, repo.Owner, repo.Name, opt) // make the request
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())
@@ -142,6 +166,7 @@ func GetCommits(client *github.Client, ctx context.Context, repo *models.Reposit
 func GetContributors(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for contributors
 	contr, response, err := client.Repositories.ListContributors(ctx, repo.Owner, repo.Name, nil) // make the requests
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())
@@ -159,6 +184,7 @@ func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Reposit
 	}
 	err := client.Query(ctx, &models.Stars, variables) // make the graphql request
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("GraphQL", err.Error(), 400)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())
@@ -172,6 +198,7 @@ func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Reposit
 func GetReadme(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for readme
 	readme, response, err := client.Repositories.GetReadme(ctx, repo.Owner, repo.Name, &github.RepositoryContentGetOptions{}) // make the requests
 	if err != nil {
+		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
 		fmt.Println(newError.Error())
 		logger.Info(newError.Error())

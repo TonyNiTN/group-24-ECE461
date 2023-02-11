@@ -31,6 +31,7 @@ func Score(urlLinks []string, logger *zap.Logger) {
 	var repos []*models.Repository
 	client, ctx := api.CreateRESTClient()
 	graphqlClient, graphqlCtx := api.CreateGQLClient()
+
 	for _, url := range urlLinks {
 		owner, name := api.ParseUrl(url)
 		if owner == "" || name == "" {
@@ -40,9 +41,14 @@ func Score(urlLinks []string, logger *zap.Logger) {
 			repo.Name = name
 			repo.Owner = owner
 			repo.Url = url
-			api.SendRequests(client, graphqlClient, ctx, graphqlCtx, repo, logger)
+			flag := api.SendRequests(client, graphqlClient, ctx, graphqlCtx, repo, logger)
+			if flag != 0 {
+				continue
+			}
+			
 			scorer.CalculatePackageScore(repo)
 			repos = append(repos, repo)
+			
 		}
 	}
 	models.ShowResults(repos)
