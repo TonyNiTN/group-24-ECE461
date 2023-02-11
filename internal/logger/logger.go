@@ -8,20 +8,19 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"group-24-ECE461/internal/config"
 )
 
 func InitLogger() (*zap.Logger, error) {
 
 	// Get Log variables from ENV
-	logLevel := os.Getenv("LOG_LEVEL")
-	logFile := os.Getenv("LOG_FILE")
+	cfg := config.NewConfig()
+	//cfg.CheckLog()
+	logLevel := cfg.LogLevel
+	logFile := cfg.LogFile
 
 	//fmt.Println(logFile)
-
-	// Check LOG_PATH is not empty
-	if logFile == "" {
-		logFile = "mylog.log"
-	}
 
 	dir := filepath.Dir(logFile)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

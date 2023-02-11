@@ -5,9 +5,18 @@ import (
 	"group-24-ECE461/internal/logger"
 	"group-24-ECE461/internal/parser"
 	"os"
+
+	"group-24-ECE461/internal/config"
 )
 
 func main() {
+
+	cfg := config.NewConfig()
+
+	if err := cfg.CheckToken(); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
 	logger, err := logger.InitLogger()
 	if err != nil {

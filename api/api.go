@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"group-24-ECE461/internal/config"
 	"group-24-ECE461/internal/error"
 	"group-24-ECE461/internal/helper"
 	"group-24-ECE461/internal/models"
 	"io"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 
@@ -74,19 +74,21 @@ func GetRepoOwnerFromNPM(pack string) string {
 }
 
 func CreateRESTClient() (*github.Client, context.Context) { // function to create github REST api client
-	ctx := context.Background()                                                           // create empty context
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")}) // configure auth header for the client
-	tc := oauth2.NewClient(ctx, ts)                                                       // create new http client
-	client := github.NewClient(tc)                                                        // create new github rest api client from the http client template
-	return client, ctx                                                                    // returns the github rest api client and the empty context
+	ctx := context.Background() // create empty context
+	cfg := config.NewConfig()
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
+	tc := oauth2.NewClient(ctx, ts)                                             // create new http client
+	client := github.NewClient(tc)                                              // create new github rest api client from the http client template
+	return client, ctx                                                          // returns the github rest api client and the empty context
 }
 
 func CreateGQLClient() (*githubv4.Client, context.Context) { // function to creategithub GraphQL api client
-	ctx := context.Background()                                                           // create empty context
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")}) // configure auth header for the client
-	tc := oauth2.NewClient(ctx, ts)                                                       // create new http client
-	graphqlClient := githubv4.NewClient(tc)                                               // create new github graphql api client from the http client template
-	return graphqlClient, ctx                                                             // returns the github graphql api client and the empty context
+	ctx := context.Background() // create empty context
+	cfg := config.NewConfig()
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
+	tc := oauth2.NewClient(ctx, ts)                                             // create new http client
+	graphqlClient := githubv4.NewClient(tc)                                     // create new github graphql api client from the http client template
+	return graphqlClient, ctx                                                   // returns the github graphql api client and the empty context
 }
 
 func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get request for pull requests
