@@ -7,14 +7,14 @@ import (
 	"os"
 
 	"group-24-ECE461/internal/config"
+	"group-24-ECE461/internal/error"
 )
 
 func main() {
 
 	cfg := config.NewConfig()
-
 	if err := cfg.CheckToken(); err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(error.NewGeneralError("cfg.CheckToken", err.Error()).Error())
 		return
 	}
 
