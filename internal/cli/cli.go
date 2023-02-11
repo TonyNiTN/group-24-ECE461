@@ -10,9 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func Install(logger *zap.Logger) {
-	fmt.Println("Installing....")
-	cmd := exec.Command("go", "install")
+func Install(logger *zap.Logger) {fmt.Println("Installing....")
+	cmd := exec.Command("go", "mod", "download")
 	err := cmd.Run()
 	if err != nil {
 		logger.Debug("Error installing program!")
@@ -20,6 +19,13 @@ func Install(logger *zap.Logger) {
 		return
 	}
 	fmt.Println("Installation successful")
+	out, err := exec.Command("go", "list", "-m", "all").Output()
+	if err != nil {
+		fmt.Println("Error executing 'go list -m all':", err)
+		return
+	}
+	dependencies := strings.Split(string(out), "\n")
+	fmt.Printf("Number of dependencies: %d\n", len(dependencies)-1)
 }
 
 func Score(urlLinks []string, logger *zap.Logger) {
