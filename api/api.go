@@ -190,7 +190,11 @@ func ParseUrl(url string) (owner string, name string) {
 	res, _ = regexp.MatchString(`(?i)npmjs\b`, url)
 	if res {
 		name = helper.GetPackageName(url)
-		owner = GetRepoOwnerFromNPM(name)
+		if name != ""{
+			owner = GetRepoOwnerFromNPM(name)
+		} else {
+			owner = ""
+		}
 	}
 
 	return owner, name

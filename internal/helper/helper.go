@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
 	"github.com/google/go-github/github"
 )
 
@@ -49,7 +48,10 @@ func GetLastWeek() string { // function to get the day 1 week before today. Retu
 }
 
 func GetOwnerAndName(url string) (owner string, name string) {
-	parts := strings.Split(url, ".com/")
+	parts := strings.Split(url, ".com/") 	
+	if len(parts) == 1 {
+		return "", ""
+	}
 	parts = strings.Split(parts[1], "/")
 	owner = parts[0]
 	name = parts[1]
@@ -59,6 +61,9 @@ func GetOwnerAndName(url string) (owner string, name string) {
 
 func GetPackageName(url string) (name string) {
 	parts := strings.Split(url, "package/")
+	if len(parts) == 1 {
+		return ""
+	}
 	name = parts[1]
 	return name
 }
