@@ -12,9 +12,15 @@ Group:
 
 # CMD
 
+- This is the directory where main.go is located.
+- This is where LOG_FILE will default to if there is not set value.
+- You can run the code manually in this directory using: `go run main.go args`
+
 # API
 
 # Internal
+
+- The internal directory contains all the business logic that is unique to this project, it should not be used outside of this project.
 
 ## CLI
 
@@ -72,8 +78,26 @@ Group:
 
 ## Models
 
-## Parser
+- The models package is used to setup querys for HTTP requests.
+- This also contains additional information (listed below) that will be used in the scorer package.
+
+### licenses
+
+- This contains a list of licenses thare are compatible with Gnu GPL.
+
+- The list is sourced from: [Gnu GPL List](https://www.gnu.org/licenses/license-list.en.html).
+
+### query
+
+- This sets up the GraphQL query used in api/api.go
+
+### repositroy
+
+- The repositroy sets up a Respositroy struct for each package given in the input.
+- This struct will then be passed to the scorer package.
 
 ## Scorer
+
+- the scorer package caculates a score given a Repository struct using our algorithm.
 
 # Test

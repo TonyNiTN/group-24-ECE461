@@ -15,13 +15,13 @@ func main() {
 	cfg := config.NewConfig()
 	if err := cfg.CheckToken(); err != nil {
 		fmt.Println(error.NewGeneralError("cfg.CheckToken", err.Error()).Error())
-		return
+		os.Exit(1)
 	}
 
 	logger, err := logger.InitLogger()
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 	defer logger.Sync()
 
@@ -29,4 +29,5 @@ func main() {
 	fmt.Println("Starting Application")
 	argsWithOutProg := os.Args[1:]
 	parser.ParseArguments(argsWithOutProg, logger)
+	os.Exit(0)
 }
