@@ -10,9 +10,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func ParseArguments(argsWithOutProg []string, logger *zap.Logger) (e error) {
-	arg := argsWithOutProg[0]
-	if strings.Contains(arg, "\\") {
+func ParseArguments(argsWithProg []string, logger *zap.Logger) (e error) {
+	arg := argsWithProg[0]
+	if strings.Contains(arg, "/") {
 		file, err := os.Open(arg)
 		if err != nil {
 			fmt.Println("Error opening URL file:", err)

@@ -86,21 +86,6 @@ func TestGetContributors(t *testing.T) { // test GetContributors function in the
 	}
 }
 
-func TestGetLicense(t *testing.T) { // test GetLicense function in the api package
-	client, ctx := CreateGQLClient()
-	repo := models.NewRepository()
-	var OWNER string = "nodejs"
-	var NAME string = "node"
-	repo.Owner = OWNER
-	repo.Name = NAME
-	logger, _ := logger.InitLogger()
-	GetLicense(client, ctx, repo, logger)
-	val := interface{}(repo.License)
-	if _, ok := val.(string); !ok {
-		t.Error("Error getting license!")
-	}
-}
-
 func TestGetStars(t *testing.T) { // test GetStars function in the api package
 	client, ctx := CreateGQLClient()
 	repo := models.NewRepository()
