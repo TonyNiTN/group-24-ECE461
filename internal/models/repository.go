@@ -61,6 +61,7 @@ func SortRepositories(repos []*Repository) []*Repository {
 
 func ShowResults(repos []*Repository) {
 	var data []Package
+	repos = SortRepositories(repos)
 
 	for _, repo := range repos {
 		m := Package{
