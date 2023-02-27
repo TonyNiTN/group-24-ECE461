@@ -27,6 +27,9 @@ headerTemplate.innerHTML = `
                     <li class="nav-item">
                     <a class="nav-link" href="manage.html">Management</a>
                     </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="404lol">404</a>
+                    </li>
                 </ul>
                 <div>
                     <button class="btn btn-primary" onclick="location.href='login.html'">Login</button>
