@@ -13,7 +13,37 @@
     <body>
         <div class="container">
             <h2>ERROR 404: how did you get here?</h2>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#loginModal">TestLogin</button>
         </div>
     </body>
     <footer-component></footer-component>
+    <!-- <login-modal-component></login-modal-component> -->              
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="col-md-6">
+                        <h5 class="modal-title" id="loginModalTitle1">Sign Up</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="modal-title" id="loginModalTitle2">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-6">
+                        something 1
+                    </div>
+                    <div class="col-md-6">
+                        something 2
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 <html>
