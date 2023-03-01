@@ -7,7 +7,7 @@ class Header extends HTMLElement {
 
     connectedCallback() {
         this.innerHTML = `
-    <header>
+        <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
                 <a class="navbar-brand nav-link active" href="index.html">Packit</a>
@@ -37,6 +37,9 @@ class Header extends HTMLElement {
             </div>
         </nav>
     </header>
+        `
+        // const shadowRoot = this.attachShadow({ mode: 'closed' });
+    /* MODAL EXP
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div> 
@@ -57,9 +60,7 @@ class Header extends HTMLElement {
             </div>
         </div>
     </div>
-        `
-        // const shadowRoot = this.attachShadow({ mode: 'closed' });
-
+     */
         // shadowRoot.appendChild(headerTemplate.content);
     }
 }
