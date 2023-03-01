@@ -30,21 +30,51 @@
                 <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane"
                     type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>
             </li>
-            <li class="nav-item" role="presentation">
+            <!-- <li class="nav-item" role="presentation">
                 <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane"
                     type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false"
                     disabled>Disabled</button>
-            </li>
+            </li> -->
         </ul>
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
-                tabindex="0">...</div>
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">In/Ext</th>
+                            <th scope="col">Info</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Internal</td>
+                            <td>GitHub</td>
+                            <td>Edit/Page</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>External</td>
+                            <td>GitHub</td>
+                            <td>Edit/Page</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                ...</div>
+                tab2
+            </div>
             <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                ...</div>
-            <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab"
-                tabindex="0">...</div>
+                tab3
+            </div>
+            <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
+                tab4
+            </div>
         </div>
         <!-- <ul class="nav nav-tabs">
                 <li class="nav-item">
@@ -80,33 +110,6 @@
             const triggerFirstTabEl = document.querySelector('#myTab li:first-child button')
             bootstrap.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
         </script>
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">In/Ext</th>
-                    <th scope="col">Info</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="table-group-divider">
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Internal</td>
-                    <td>GitHub</td>
-                    <td>Edit/Page</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>External</td>
-                    <td>GitHub</td>
-                    <td>Edit/Page</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
