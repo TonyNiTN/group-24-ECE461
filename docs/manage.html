@@ -14,6 +14,51 @@
     <body>
         <div class="container">
             <h2>Manage</h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Created</th>
+                        <!-- <th scope="col">Roles</th> -->
+                        <th scope="col">Perm Level</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <!-- This eventually gets done in JS, but this is a hardcoded sample listing -->
+                    <tr>
+                        <th scope="row">-1</th>
+                        <td><a href="#">Barak Obama</a></td>
+                        <td>2/4/2023</td>
+                        <!-- <td>Admin, Developer</td> -->
+                        <td>600</td>
+                        <td>
+                            <a href="edit-user/#"><i class="bi bi-gear-wide-connected"></i></a> 
+                            <!-- takes you to user settings -->
+                            &nbsp;
+                            <a href=""><i class="bi bi-trash3-fill"></i></a>
+                            <!-- brings up the delete modal -->
+                            &nbsp;
+                            <a href="user/#"><i class="bi bi-person-fill"></i></a>
+                            <!-- takes you to the user profile + history -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </body>
     <footer-component></footer-component>

@@ -38,6 +38,7 @@ class Header extends HTMLElement {
         </nav>
     </header>
         `
+        //<i class="bi bi-gear-wide-connected"></i> might replace settings
         // const shadowRoot = this.attachShadow({ mode: 'closed' });
     /* MODAL EXP
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
