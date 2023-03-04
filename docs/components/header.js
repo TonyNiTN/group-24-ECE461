@@ -13,7 +13,7 @@ class Header extends HTMLElement {
                 <a class="navbar-brand nav-link active" href="index.html">Packit</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-                </button>
+                </båutton>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
@@ -40,28 +40,28 @@ class Header extends HTMLElement {
         `
         //<i class="bi bi-gear-wide-connected"></i> might replace settings
         // const shadowRoot = this.attachShadow({ mode: 'closed' });
-    /* MODAL EXP
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div> 
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLongTitle">Login/Sign upo</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    something
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
-     */
+    // MODAL EXP
+    // <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalCenterTitle" aria-hidden="true">
+    //     <div class="modal-dialog modal-dialog-centered" role="document">
+    //         <div> 
+    //             <div class="modal-content">
+    //             <div class="modal-header">
+    //                 <h5 class="modal-title" id="loginModalLongTitle">Login/Sign upo</h5>
+    //                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    //                 <span aria-hidden="true">&times;</span>
+    //                 </button>
+    //             </div>
+    //             <div class="modal-body">
+    //                 something
+    //             </div>
+    //             <div class="modal-footer">
+    //                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    //             </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    // </div>
+    
         // shadowRoot.appendChild(headerTemplate.content);
     }
 }
