@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"github.com/gregjones/httpcache"
 	"github.com/shurcooL/githubv4"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -100,12 +99,7 @@ func CreateRESTClient() (*github.Client, context.Context) { // function to creat
 	ctx := context.Background() // create empty context
 	cfg := config.NewConfig()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
-	tc := &http.Client{
-		Transport: &oauth2.Transport{
-			Base:   httpcache.NewMemoryCacheTransport(),
-			Source: ts,
-		},
-	}
+	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 	return client, ctx // returns the github rest api client and the empty context
 }
