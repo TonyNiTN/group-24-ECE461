@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/gregjones/httpcache"
 	"github.com/shurcooL/githubv4"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -28,6 +29,7 @@ import (
 //Responsiveness: pull requests in the last week to open issues in the last week ;; using REST API
 //License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
+
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger) (f int) {
 	flag = 0
 	GetStars(graphqlClient, ctx, repo, logger)
@@ -98,9 +100,14 @@ func CreateRESTClient() (*github.Client, context.Context) { // function to creat
 	ctx := context.Background() // create empty context
 	cfg := config.NewConfig()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
-	tc := oauth2.NewClient(ctx, ts)                                             // create new http client
-	client := github.NewClient(tc)                                              // create new github rest api client from the http client template
-	return client, ctx                                                          // returns the github rest api client and the empty context
+	tc := &http.Client{
+		Transport: &oauth2.Transport{
+			Base:   httpcache.NewMemoryCacheTransport(),
+			Source: ts,
+		},
+	}
+	client := github.NewClient(tc)
+	return client, ctx // returns the github rest api client and the empty context
 }
 
 func CreateGQLClient() (*githubv4.Client, context.Context) { // function to creategithub GraphQL api client
@@ -112,10 +119,14 @@ func CreateGQLClient() (*githubv4.Client, context.Context) { // function to crea
 	return graphqlClient, ctx                                                   // returns the github graphql api client and the empty context
 }
 
-func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) () { // function to make get request for pull requests
+func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get request for pull requests
 	since := helper.GetLastWeek()                                                              // get date to filter results by
 	s := fmt.Sprintf("org:%s repo:%s created:>%s is:pr is:open", repo.Owner, repo.Name, since) // create query string
 	prs, response, err := client.Search.Issues(ctx, s, &github.SearchOptions{})                // make the request
+	if response.Remaining == 0 {
+		fmt.Println("You've made too many requests at one time, please wait 30 seconds and try again.")
+		return
+	}
 	if err != nil {
 		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
@@ -123,7 +134,6 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 		logger.Info(newError.Error())
 		return
 	}
-
 	logger.Debug(fmt.Sprintf("Get Pull Request: %s", response.Status))
 	repo.OpenPRs = *prs.Total // populate repository field
 
@@ -204,6 +214,7 @@ func GetReadme(client *github.Client, ctx context.Context, repo *models.Reposito
 		logger.Info(newError.Error())
 		return
 	}
+
 	logger.Debug(fmt.Sprintf("Get ReadMe: %s", response.Status))
 	repo.Readme = helper.Base64Decode(*readme.Content) // populate repository field
 
@@ -217,7 +228,7 @@ func ParseUrl(url string) (owner string, name string) {
 	res, _ = regexp.MatchString(`(?i)npmjs\b`, url)
 	if res {
 		name = helper.GetPackageName(url)
-		if name != ""{
+		if name != "" {
 			owner = GetRepoOwnerFromNPM(name)
 		} else {
 			owner = ""

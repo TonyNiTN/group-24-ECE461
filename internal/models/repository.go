@@ -28,14 +28,13 @@ type Repository struct {
 
 
 type Package struct {
-	Url string `json:"Url"`
-	NetScore                  float64 `json:"netScore"`
-	NetPercentage             float64 `json:"netPercentage"`
-	RampUpTimeScore           float64 `json:"rampUpTimeScore"`
-	CorrectnessScore          float64 `json:"correctnessScore"`
-	BusFactorScore            float64 `json:"busFactorScore"`
-	ResponsivenessScore       float64 `json:"responsivenessScore"`
-	LicenseCompatibilityScore float64 `json:"licenseCompatibilityScore"`
+	Url string `json:"URL"`
+	NetPercentage             float64 `json:"NET_SCORE"`
+	RampUpTimeScore           float64 `json:"RAMP_UP_SCORE"`
+	CorrectnessScore          float64 `json:"CORRECTNESS_SCORE"`
+	BusFactorScore            float64 `json:"BUS_FACTOR_SCORE"`
+	ResponsivenessScore       float64 `json:"RESPONSIVENESS_MAINTAINER_SCORE"`
+	LicenseCompatibilityScore float64 `json:"LICENSE_SCORE"`
 
 }
 
@@ -66,8 +65,7 @@ func ShowResults(repos []*Repository) {
 	for _, repo := range repos {
 		m := Package{
 			Url: repo.Url,
-			NetScore : float64(int(repo.NetScore*100)) / 100,
-			NetPercentage: float64(int(repo.NetPercentage*100)) / 100,
+			NetPercentage: float64(int(repo.NetPercentage)) / 100,
 			RampUpTimeScore : float64(int(repo.RampUpTimeScore*100)) / 100,
 			CorrectnessScore : float64(int(repo.CorrectnessScore*100)) / 100,
 			BusFactorScore : float64(int(repo.BusFactorScore*100)) / 100,
