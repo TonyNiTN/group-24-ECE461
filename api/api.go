@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/patrickmn/go-cache"
 	"github.com/shurcooL/githubv4"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -29,29 +30,29 @@ import (
 //License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
 
-func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger) (f int) {
+func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {
 	flag = 0
-	GetStars(graphqlClient, ctx, repo, logger)
+	GetStars(graphqlClient, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
-	GetReadme(client, ctx, repo, logger)
+	GetReadme(client, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
-	GetPullRequests(client, ctx, repo, logger)
+	GetPullRequests(client, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
-	GetIssues(client, ctx, repo, logger)
+	GetIssues(client, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
-	GetContributors(client, ctx, repo, logger)
+	GetContributors(client, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
-	GetCommits(client, ctx, repo, logger)
+	GetCommits(client, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
 	}
@@ -113,14 +114,16 @@ func CreateGQLClient() (*githubv4.Client, context.Context) { // function to crea
 	return graphqlClient, ctx                                                   // returns the github graphql api client and the empty context
 }
 
-func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get request for pull requests
+func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get request for pull requests
+	cachedResp, found := c.Get(fmt.Sprintf("%s-prs", repo.Url))
+	if found {
+		// use the cached response
+		repo.OpenPRs = cachedResp.(int)
+		return
+	}
 	since := helper.GetLastWeek()                                                              // get date to filter results by
 	s := fmt.Sprintf("org:%s repo:%s created:>%s is:pr is:open", repo.Owner, repo.Name, since) // create query string
 	prs, response, err := client.Search.Issues(ctx, s, &github.SearchOptions{})                // make the request
-	if response.Remaining == 0 {
-		fmt.Println("You've made too many requests at one time, please wait 30 seconds and try again.")
-		return
-	}
 	if err != nil {
 		flag = 1
 		newError := error.NewRequestError("REST", err.Error(), response.StatusCode)
@@ -128,12 +131,20 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 		logger.Info(newError.Error())
 		return
 	}
+	c.Set(fmt.Sprintf("%s-prs", repo.Url), *prs.Total, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Pull Request: %s", response.Status))
 	repo.OpenPRs = *prs.Total // populate repository field
 
 }
 
-func GetIssues(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for issues
+func GetIssues(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get requests for issues
+	cachedResp, found := c.Get(fmt.Sprintf("%s-issues", repo.Url))
+	if found {
+		// use the cached response
+		repo.OpenIssues = cachedResp.(int)
+		return
+	}
+
 	since := helper.GetLastWeek()                                                              // get date to filter results by
 	s := fmt.Sprintf("org:%s repo:%s created:>%s is:pr is:open", repo.Owner, repo.Name, since) // create query string
 	issues, response, err := client.Search.Issues(ctx, s, &github.SearchOptions{})             // make the request
@@ -144,12 +155,20 @@ func GetIssues(client *github.Client, ctx context.Context, repo *models.Reposito
 		logger.Info(newError.Error())
 		return
 	}
+	c.Set(fmt.Sprintf("%s-issues", repo.Url), *issues.Total, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Issues: %s", response.Status))
 	repo.OpenIssues = *issues.Total // populate repository field
 
 }
 
-func GetCommits(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for commits
+func GetCommits(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get requests for commits
+	cachedResp, found := c.Get(fmt.Sprintf("%s-issues", repo.Url))
+	if found {
+		// use the cached response
+		repo.Commits = cachedResp.(int)
+		return
+	}
+
 	opt := &github.CommitsListOptions{ // define options structure to indicate results per page
 		ListOptions: github.ListOptions{PerPage: 30}, // here, it's 30 results per page, as default.
 	}
@@ -162,12 +181,21 @@ func GetCommits(client *github.Client, ctx context.Context, repo *models.Reposit
 		logger.Info(newError.Error())
 		return
 	}
+
+	c.Set(fmt.Sprintf("%s-commits", repo.Url), response.LastPage*30, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Commits: %s", response.Status))
 	repo.Commits = response.LastPage * 30 // populate repository field
 
 }
 
-func GetContributors(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for contributors
+func GetContributors(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get requests for contributors
+	cachedResp, found := c.Get(fmt.Sprintf("%s-contributors", repo.Url))
+	if found {
+		// use the cached response
+		repo.TopContributions = cachedResp.(int)
+		return
+	}
+
 	contr, response, err := client.Repositories.ListContributors(ctx, repo.Owner, repo.Name, nil) // make the requests
 	if err != nil {
 		flag = 1
@@ -176,12 +204,21 @@ func GetContributors(client *github.Client, ctx context.Context, repo *models.Re
 		logger.Info(newError.Error())
 		return
 	}
+	topFive := helper.GetTopFiveContributions(contr)
+	c.Set(fmt.Sprintf("%s-contributors", repo.Url), topFive, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Contributors: %s", response.Status))
-	repo.TopContributions = helper.GetTopFiveContributions(contr) // populate repository field with the total contributions of top 5 contributors
+	repo.TopContributions = topFive // populate repository field with the total contributions of top 5 contributors
 
 }
 
-func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for stargazers
+func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get requests for stargazers
+	cachedResp, found := c.Get(fmt.Sprintf("%s-stars", repo.Url))
+	if found {
+		// use the cached response
+		repo.StarsCount = cachedResp.(int)
+		return
+	}
+
 	variables := map[string]interface{}{ // variables to dynamically populate the graphql query structure
 		"owner": githubv4.String(repo.Owner),
 		"name":  githubv4.String(repo.Name),
@@ -194,12 +231,20 @@ func GetStars(client *githubv4.Client, ctx context.Context, repo *models.Reposit
 		logger.Info(newError.Error())
 		return
 	}
+	c.Set(fmt.Sprintf("%s-stars", repo.Url), models.Stars.Repository.StargazerCount, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Stars: %s", "200 OK"))
 	repo.StarsCount = models.Stars.Repository.StargazerCount // populate repository field
 
 }
 
-func GetReadme(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger) { // function to make get requests for readme
+func GetReadme(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get requests for readme
+	cachedResp, found := c.Get(fmt.Sprintf("%s-readme", repo.Url))
+	if found {
+		// use the cached response
+		repo.Readme = cachedResp.(string)
+		return
+	}
+
 	readme, response, err := client.Repositories.GetReadme(ctx, repo.Owner, repo.Name, &github.RepositoryContentGetOptions{}) // make the requests
 	if err != nil {
 		flag = 1
@@ -208,9 +253,10 @@ func GetReadme(client *github.Client, ctx context.Context, repo *models.Reposito
 		logger.Info(newError.Error())
 		return
 	}
-
+	rm := helper.Base64Decode(*readme.Content)
+	c.Set(fmt.Sprintf("%s-readme", repo.Url), rm, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get ReadMe: %s", response.Status))
-	repo.Readme = helper.Base64Decode(*readme.Content) // populate repository field
+	repo.Readme = rm // populate repository field
 
 }
 

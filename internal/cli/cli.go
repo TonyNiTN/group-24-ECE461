@@ -5,8 +5,12 @@ import (
 	"group-24-ECE461/api"
 	"group-24-ECE461/internal/models"
 	"group-24-ECE461/internal/scorer"
-	"strings"
+	"os"
 	"os/exec"
+	"strings"
+	"time"
+
+	"github.com/patrickmn/go-cache"
 
 	"go.uber.org/zap"
 )
@@ -31,7 +35,27 @@ func Score(urlLinks []string, logger *zap.Logger) {
 	var repos []*models.Repository
 	client, ctx := api.CreateRESTClient()
 	graphqlClient, graphqlCtx := api.CreateGQLClient()
+	c := cache.New(5*time.Minute, 10*time.Minute)
+	//workingDir, _ := os.Getwd()
+	//cacheDir := filepath.Join(workingDir, "program-cache")
+	if _, err := os.Stat("cache.txt"); os.IsNotExist(err) {
+		// Create input.txt if it does not exist
+		file, err := os.Create("cache.txt")
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+		logger.Debug("Created cache.txt")
+	} else if err != nil {
+		logger.Debug("Error checking for the cache file.")
+	} else {
+		logger.Debug("cache.txt exists")
+		err := c.LoadFile("cache.txt")
+		if err != nil {
+			logger.Debug("Error loading cache from file!")
+		}
 
+	}
 	for _, url := range urlLinks {
 		owner, name := api.ParseUrl(url)
 		if owner == "" || name == "" {
@@ -41,16 +65,17 @@ func Score(urlLinks []string, logger *zap.Logger) {
 			repo.Name = name
 			repo.Owner = owner
 			repo.Url = url
-			flag := api.SendRequests(client, graphqlClient, ctx, graphqlCtx, repo, logger)
+			flag := api.SendRequests(client, graphqlClient, ctx, graphqlCtx, repo, logger, c)
 			if flag != 0 {
 				continue
 			}
-			
+
 			scorer.CalculatePackageScore(repo)
 			repos = append(repos, repo)
-			
+
 		}
 	}
+	c.SaveFile("cache.txt")
 	models.ShowResults(repos)
 }
 
