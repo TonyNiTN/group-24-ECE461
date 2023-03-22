@@ -10,22 +10,9 @@ package tests
 // 	passed = 0    // initialize passed tests
 // 	testCount = 0 // initialize all tests
 // 	fmt.Println("Running Tests on Helpers...")
-// 	TestBase64Encode()                                                                                      // run test on Base64Encode function
 // 	TestBase64Decode()                                                                                      // run test on Base64Decode function
 // 	TestGetLastWeek()                                                                                       // run test on GetLastWeek function
 // 	fmt.Printf("Passed %d of %d tests. Completion: %%/%d\n\n\n", passed, testCount, (passed/testCount)*100) // Print test results
-// }
-
-// func TestBase64Encode() { // test Base64Encode function in the helper package
-// 	testCount++                        // increment overall test count
-// 	str := helper.Base64Encode("test") // call the function
-// 	val := interface{}(str)            // cast to interface for type comparison
-// 	if _, ok := val.(string); !ok {    // compare type
-// 		fmt.Println("Error encoding to base 64") // error message
-// 	} else {
-// 		fmt.Println("Success encoding to base 64") // success message
-// 		passed++                                   // increment passed test count
-// 	}
 // }
 
 // func TestBase64Decode() { // test Base63Decode function in the helper package
