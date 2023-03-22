@@ -31,7 +31,7 @@ func Score(urlLinks []string, logger *zap.Logger) {
 		fmt.Println("Input file is empty, No Url to read!")
 		return
 	}
-	fmt.Println("Scoring.....")
+	// fmt.Println("Scoring.....")
 	var repos []*models.Repository
 	client, ctx := api.CreateRESTClient()
 	graphqlClient, graphqlCtx := api.CreateGQLClient()

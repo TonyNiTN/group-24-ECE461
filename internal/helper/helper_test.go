@@ -6,14 +6,6 @@ import (
 
 // Test suite on helper package
 
-func TestBase64Encode(t *testing.T) { // test Base64Encode function in the helper package
-	str := Base64Encode("test")     // call the function
-	val := interface{}(str)         // cast to interface for type comparison
-	if _, ok := val.(string); !ok { // compare type
-		t.Error("Error encoding to base 64")
-	}
-}
-
 func TestBase64Decode(t *testing.T) { // test Base63Decode function in the helper package
 	str := Base64Decode("test")     // call the function
 	val := interface{}(str)         // cast to interface for type comparison

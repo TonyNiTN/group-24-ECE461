@@ -9,10 +9,6 @@ import (
 	"github.com/google/go-github/github"
 )
 
-func Base64Encode(str string) string { // function to encode a string to base64
-	return base64.StdEncoding.EncodeToString([]byte(str))
-}
-
 func Base64Decode(str string) string { // function to decode a base64 encoded string
 	data, err := base64.StdEncoding.DecodeString(str)
 	if err != nil {
