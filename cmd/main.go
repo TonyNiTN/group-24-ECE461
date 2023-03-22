@@ -26,7 +26,7 @@ func main() {
 	defer logger.Sync()
 
 	logger.Info("Starting Application")
-	fmt.Println("Starting Application")
+	// fmt.Println("Starting Application")
 	argsWithOutProg := os.Args[1:]
 	parser.ParseArguments(argsWithOutProg, logger)
 	os.Exit(0)

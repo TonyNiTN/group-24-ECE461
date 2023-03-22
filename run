@@ -12,9 +12,9 @@ else
     fi
   elif [ $1 = "install" ]; then
     go mod download
-    main install
+    ./main install
   elif [[ $1 == *"/"* ]]; then
-    main $1
+    ./main $1
   elif [[ $1 == "test" ]]; then
     go test ./... -cover
   else
