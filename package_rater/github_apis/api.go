@@ -31,6 +31,12 @@ import (
 // License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
 
+// type DependenciesFactors struct {
+// 	Data struct {
+// 		Repository struct
+// 	}
+// }
+
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {
 	flag = 0
 
