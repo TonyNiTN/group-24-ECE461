@@ -21,6 +21,7 @@ func CalculatePackageScore(repo *models.Repository) {
 	CalculateBusFactor(repo)
 	CalculateResponsiveness(repo)
 	CalculateLicenseCompatibility(repo)
+	CalculateVersionScore(repo)
 	CalculateNetScore(repo)
 }
 
@@ -32,6 +33,11 @@ func CalculateNetScore(repo *models.Repository) {
 	repo.NetPercentage = (netScore / float64(8)) * float64(100)
 }
 
+func CalculateVersionScore(repo *models.Repository) {
+	score := float64(repo.DependencyCount)
+
+	repo.VersionScore = score
+}
 func CalculateRampUpTime(repo *models.Repository) {
 	rampUpTime := 0.0
 	res, _ := regexp.MatchString(`(?i)docs\b`, repo.Readme)

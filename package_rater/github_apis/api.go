@@ -31,6 +31,12 @@ import (
 // License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
 
+// type DependenciesFactors struct {
+// 	Data struct {
+// 		Repository struct
+// 	}
+// }
+
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {
 	flag = 0
 	GetStars(graphqlClient, ctx, repo, logger, cache)
@@ -134,7 +140,66 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 	}
 	c.Set(fmt.Sprintf("%s-prs", repo.Url), *prs.Total, cache.DefaultExpiration)
 	logger.Debug(fmt.Sprintf("Get Pull Request: %s", response.Status))
-	repo.OpenPRs = *prs.Total // populate repository field
+	repo.OpenPRs = *prs.Total // populate reposigotory field
+
+}
+
+// func buildDependenciesQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) (query map[string]string) {
+// 	// going to ignore cache stuff for now
+// 	var dependenciesQuery = map[string]string{
+// 		"query": `
+// 		{
+// 			repository(owner:` + `"` + repo.Owner + `", name:` + `"` + repo.Name + `") {
+// 			  dependencyGraphManifests {
+// 				totalCount
+// 				nodes {
+// 				  filename
+// 				}
+// 				edges {
+// 				  node {
+// 					blobPath
+// 					dependencies {
+// 					  totalCount
+// 					  nodes {
+// 						packageName
+// 						requirements
+// 						hasDependencies
+// 						packageManager
+// 					  }
+// 					}
+// 				  }
+// 				}
+// 			  }
+// 			}
+// 		  }`,
+// 	}
+// 	return dependenciesQuery
+// }
+
+func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) {
+	// query := buildDependenciesQuery(client, ctx, repo, logger, c)
+	// jsonValue, _ := json.Marshal(query)
+	// req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+	// http_client := &http.Client{Timeout: time.Second * 10}
+	// res, err := http_client.Do(req)
+	// if err != nil {
+	// 	return 0, fmt.Errorf("The GraphQL query failed with error %s\n", err)
+	// }
+	// defer res.Body.Close()
+	// return 0, nil
+	variables := map[string]interface{}{ // variables to dynamically populate the graphql query structure
+		"owner": githubv4.String(repo.Owner),
+		"name":  githubv4.String(repo.Name),
+	}
+	err := client.Query(ctx, &models.Dependency, variables)
+	if err != nil {
+		flag = 1
+		newError := error.NewRequestError("GraphQL", err.Error(), 400)
+		fmt.Println(newError.Error())
+		logger.Info(newError.Error())
+		return
+	}
+	repo.DependencyCount = models.Dependency.Repository.DependencyGraphManifests.TotalCount
 
 }
 
