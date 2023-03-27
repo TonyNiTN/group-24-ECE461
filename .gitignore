@@ -20,3 +20,8 @@ log
 **/*.log
 
 .DS_Store
+
+
+# additions for testing (emile)
+deps.txt
+node_modules

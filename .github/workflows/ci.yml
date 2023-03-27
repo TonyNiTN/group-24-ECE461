@@ -1,0 +1,44 @@
+name: ci
+run-name: ${{ github.actor }} is trying to integrate
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lint with Go fmt
+        run: gofmt -w -s .
+
+  test-rater:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run install
+        run: ./run install
+      - name: Run build
+        run: ./run build
+      - name: Run Test
+        run: ./run test
+      - name: Set env
+        run: echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
+      - name: Run URL_FILE
+        run: ./run "${ABSFILEPATH}"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build 'delete' container
+        run: |
+        cd delete-apis/
+        docker build . -t delete-container
+        docker run -p 3000:8080 --name my-node-app-container my-node-app
+      - name: Build 'read' container
+        run: |
+        cd read-apis/
+        docker build . -t 
+
+    build-running-containers:

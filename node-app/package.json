@@ -1,0 +1,31 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "test app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Emile",
+  "license": "ISC",
+  "dependencies": {
+    "ee-first": "^1.1.1",
+    "express": "^4.18.2",
+    "forwarded": "^0.2.0",
+    "function-bind": "^1.1.1",
+    "has": "^1.0.3",
+    "inherits": "^2.0.4",
+    "ipaddr.js": "^1.9.1",
+    "media-typer": "^0.3.0",
+    "mime": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/packit461/packit23.git#main"
+  },
+  "bugs": {
+    "url": "https://github.com/packit461/packit23/issues"
+  },
+  "homepage": "https://github.com/packit461/packit23/tree/main#readme"
+}
