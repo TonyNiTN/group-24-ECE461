@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"group-24-ECE461/internal/config"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/config"
 )
 
 func InitLogger() (*zap.Logger, error) {

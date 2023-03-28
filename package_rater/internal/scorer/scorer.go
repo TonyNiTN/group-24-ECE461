@@ -1,8 +1,9 @@
 package scorer
 
 import (
-	"group-24-ECE461/internal/models"
 	"regexp"
+
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/models"
 )
 
 //TODO:

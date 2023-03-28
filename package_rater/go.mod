@@ -1,4 +1,4 @@
-module packit23
+module github.com/packit461/packit23/tree/containerized-app/package_rater/
 
 go 1.19
 

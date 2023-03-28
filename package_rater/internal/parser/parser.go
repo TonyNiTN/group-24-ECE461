@@ -3,9 +3,10 @@ package parser
 import (
 	"bufio"
 	"fmt"
-	"group-24-ECE461/internal/cli"
 	"os"
 	"strings"
+
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/cli"
 
 	"go.uber.org/zap"
 )

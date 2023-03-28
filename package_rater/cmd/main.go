@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"packit23/package_rater/internal/logger"
-	"packit23/package_rater/internal/parser"
 
-	"group-24-ECE461/internal/config"
-	"group-24-ECE461/internal/error"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/config"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/error"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/logger"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/parser"
 )
 
 func main() {

@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
-	api "group-24-ECE461/github-apis"
-	"group-24-ECE461/internal/models"
-	"group-24-ECE461/internal/scorer"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	api "github.com/packit461/packit23/tree/containarized-app/package_rater/github_apis"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/models"
+	"github.com/packit461/packit23/tree/containarized-app/package_rater/internal/scorer"
 
 	"github.com/patrickmn/go-cache"
 

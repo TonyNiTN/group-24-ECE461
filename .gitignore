@@ -60,3 +60,8 @@ _override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# coverage reports
+coverage_*
+.coverage
+.pytest_cache

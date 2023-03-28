@@ -1,44 +1,72 @@
 name: ci
-run-name: ${{ github.actor }} is trying to integrate
+run-name: Testing and integration
 on: [push]
 jobs:
-  lint:
+  install-deps:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - name: Install python dependencies
+      run: pip install Flask pylint black pytest pytest-cov
+
+  lint-go:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Lint with Go fmt
-        run: gofmt -w -s .
+      - name: Lint rater with Go fmt
+        run: gofmt -w -s package_rater/*
+
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lint backend with pylint
+        run: |
+        black delete_apis/*.py read_apis/*.py write_apis/*.py
+        pylint delete_apis/*.py read_apis/*.py write_apis/*.py
 
   test-rater:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Run install
-        run: ./run install
+        run: ./package_rater/run install
       - name: Run build
-        run: ./run build
+        run: ./package_rater/run build
       - name: Run Test
-        run: ./run test
+        run: ./package_rater/runtest
       - name: Set env
-        run: echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
+        run: |
+        cd package_rater/
+        echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
       - name: Run URL_FILE
-        run: ./run "${ABSFILEPATH}"
+        run: ./package_rater/run "${ABSFILEPATH}"
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-images:
+  test-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build 'delete' container
+      - name: test delete apis
         run: |
-        cd delete-apis/
-        docker build . -t delete-container
-        docker run -p 3000:8080 --name my-node-app-container my-node-app
-      - name: Build 'read' container
-        run: |
-        cd read-apis/
-        docker build . -t 
+        pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
+        pytest read_apis/*.py --cov --cov-report=html:coverage_read
+        pytest write_apis/*.py --cov --cov-report=html:coverage_write
 
-    build-running-containers:
+  # build-images:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Build 'delete' container
+  #       run: |
+  #       cd delete-apis/
+  #       docker build . -t delete-container
+  #       docker run -p 3000:8080 --name my-node-app-container my-node-app
+  #     - name: Build 'read' container
+  #       run: |
+  #       cd read-apis/
+  #       docker build . -t 
+
+  #   build-running-containers:
