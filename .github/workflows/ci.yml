@@ -2,33 +2,52 @@ name: ci
 run-name: Testing and integration
 on: [push]
 jobs:
-  install-python-deps:
+  install-python-dependencies:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Install python dependencies
         run: pip install Flask pylint black pytest pytest-cov
-      - name: lint
-        run: python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
-  lint-backend:
+
+  lint-test-python-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Lint backend with black & pylint
         run: |
-          python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
+        python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
+        python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
+
       - name: Test backend apis
         run: |
           python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
           python -m pytest read_apis/*.py --cov --cov-report=html:coverage_read
           python -m pytest write_apis/*.py --cov --cov-report=html:coverage_write
-#         python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
+
+#   lint-backend:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.9
+#       - name: Lint backend with black & pylint
+#         run: |
+#           python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
+#       - name: Test backend apis
+#         run: |
+#           python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
+#           python -m pytest read_apis/*.py --cov --cov-report=html:coverage_read
+#           python -m pytest write_apis/*.py --cov --cov-report=html:coverage_write
+# #         python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
 
   lint-go:
     runs-on: ubuntu-latest
