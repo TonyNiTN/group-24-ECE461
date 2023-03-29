@@ -17,6 +17,10 @@ jobs:
   lint-backend:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
       - name: Lint backend with black & pylint
         run: |
           python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
