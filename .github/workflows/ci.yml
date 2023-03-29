@@ -14,13 +14,13 @@ jobs:
           python-version: 3.9
       - name: Lint backend with black & pylint
         run: |
-          python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
           python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
       - name: Test backend apis
         run: |
           python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
           python -m pytest read_apis/*.py --cov --cov-report=html:coverage_read
           python -m pytest write_apis/*.py --cov --cov-report=html:coverage_write
+#           # python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
 
   lint-go:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       - name: Set env
         run: |
           cd package_rater/
-          echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
+          echo "ABSFILEPATH=$(readlink -f package_rater/url.txt)" >> $GITHUB_ENV
       - name: Run URL_FILE
         run: ./package_rater/run "${ABSFILEPATH}"
         shell: bash
