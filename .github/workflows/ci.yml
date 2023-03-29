@@ -19,16 +19,16 @@ jobs:
 
       - name: Test backend apis
         run: |
-          python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
-          python -m pytest read_apis/*.py --cov --cov-report=html:coverage_read
-          python -m pytest write_apis/*.py --cov --cov-report=html:coverage_write
+          python -m pytest delete_apis/ --cov --cov-report=html:coverage_delete
+          python -m pytest read_apis/ --cov --cov-report=html:coverage_read
+          python -m pytest write_apis/ --cov --cov-report=html:coverage_write
 
   lint-go:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Lint rater with Go fmt
-        run: gofmt -w -s package_rater/*.go
+        run: gofmt -w -s package_rater/
 
   # lint-python:
   #   runs-on: ubuntu-latest
