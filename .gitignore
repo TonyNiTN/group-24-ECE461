@@ -25,6 +25,7 @@ log
 # additions for testing (emile)
 deps.txt
 node_modules
+todo.txt
 
 # Local .terraform directories
 */.terraform/
