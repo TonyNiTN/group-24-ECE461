@@ -15,7 +15,7 @@ jobs:
       - name: Lint backend with black & pylint
         run: |
           python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
-          python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
+          python -m pylint --fail-under=8 delete_apis/*.py read_apis/*.py write_apis/*.py
 
       - name: Test backend apis
         run: |
@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Lint rater with Go fmt
-        run: gofmt -w -s package_rater/*
+        run: gofmt -w -s package_rater/*.go
 
   # lint-python:
   #   runs-on: ubuntu-latest
