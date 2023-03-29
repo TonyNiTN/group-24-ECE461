@@ -3,11 +3,11 @@ run-name: Testing and integration
 on: [push]
 jobs:
   install-deps:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - name: Install python dependencies
-      run: pip install Flask pylint black pytest pytest-cov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install python dependencies
+        run: pip install Flask pylint black pytest pytest-cov
 
   lint-go:
     runs-on: ubuntu-latest
