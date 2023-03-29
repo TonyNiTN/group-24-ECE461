@@ -2,16 +2,19 @@ name: ci
 run-name: Testing and integration
 on: [push]
 jobs:
-  build-python:
+  install-python-deps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install python dependencies
-        run: pip install Flask pylint black pytest pytest-cov
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Install python dependencies
+        run: pip install Flask pylint black pytest pytest-cov
+        
+  lint-backend:
+    runs-on: ubuntu-latest
+    steps:
       - name: Lint backend with black & pylint
         run: |
           python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
@@ -20,7 +23,7 @@ jobs:
           python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
           python -m pytest read_apis/*.py --cov --cov-report=html:coverage_read
           python -m pytest write_apis/*.py --cov --cov-report=html:coverage_write
-#           # python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
+#         python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
 
   lint-go:
     runs-on: ubuntu-latest
