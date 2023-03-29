@@ -2,12 +2,17 @@ name: ci
 run-name: Testing and integration
 on: [push]
 jobs:
+
   install-deps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Install python dependencies
         run: pip install Flask pylint black pytest pytest-cov
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
   lint-go:
     runs-on: ubuntu-latest
