@@ -8,17 +8,14 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install python dependencies
         run: pip install Flask pylint black pytest pytest-cov
-
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-
       - name: Lint backend with black & pylint
         run: |
           python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
           python -m pylint delete_apis/*.py read_apis/*.py write_apis/*.py
-
       - name: Test backend apis
         run: |
           python -m pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
