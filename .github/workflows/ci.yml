@@ -11,8 +11,8 @@ jobs:
           python-version: 3.9
       - name: Install python dependencies
         run: pip install Flask pylint black pytest pytest-cov
-      # - name: lint
-      #   run: python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
+      - name: lint
+        run: python -m black delete_apis/*.py read_apis/*.py write_apis/*.py
   lint-backend:
     runs-on: ubuntu-latest
     steps:
