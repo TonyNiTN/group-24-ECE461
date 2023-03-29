@@ -22,8 +22,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Lint backend with pylint
         run: |
-        black delete_apis/*.py read_apis/*.py write_apis/*.py
-        pylint delete_apis/*.py read_apis/*.py write_apis/*.py
+          black delete_apis/*.py read_apis/*.py write_apis/*.py
+          pylint delete_apis/*.py read_apis/*.py write_apis/*.py
 
   test-rater:
     runs-on: ubuntu-latest
@@ -37,8 +37,8 @@ jobs:
         run: ./package_rater/runtest
       - name: Set env
         run: |
-        cd package_rater/
-        echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
+          cd package_rater/
+          echo "ABSFILEPATH=$(readlink -f url.txt)" >> $GITHUB_ENV
       - name: Run URL_FILE
         run: ./package_rater/run "${ABSFILEPATH}"
         shell: bash
@@ -51,9 +51,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: test delete apis
         run: |
-        pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
-        pytest read_apis/*.py --cov --cov-report=html:coverage_read
-        pytest write_apis/*.py --cov --cov-report=html:coverage_write
+          pytest delete_apis/*.py --cov --cov-report=html:coverage_delete
+          pytest read_apis/*.py --cov --cov-report=html:coverage_read
+          pytest write_apis/*.py --cov --cov-report=html:coverage_write
 
   # build-images:
   #   runs-on: ubuntu-latest
