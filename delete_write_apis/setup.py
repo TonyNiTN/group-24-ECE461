@@ -1,3 +1,4 @@
+"""setup file for flask app"""
 from setuptools import setup
 
 setup(
