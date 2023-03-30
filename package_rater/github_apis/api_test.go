@@ -1,9 +1,9 @@
-package api
+package github_apis
 
 import (
 	"fmt"
-	"group-24-ECE461/internal/logger"
-	"group-24-ECE461/internal/models"
+	"github.com/packit461/packit23/package_rater/internal/logger"
+	"github.com/packit461/packit23/package_rater/internal/models"
 	"testing"
 	"time"
 

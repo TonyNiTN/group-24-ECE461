@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"group-24-ECE461/internal/logger"
-	"group-24-ECE461/internal/parser"
 	"os"
 
-	"group-24-ECE461/internal/config"
-	"group-24-ECE461/internal/error"
+	"github.com/packit461/packit23/package_rater/internal/config"
+	"github.com/packit461/packit23/package_rater/internal/error"
+	"github.com/packit461/packit23/package_rater/internal/logger"
+	"github.com/packit461/packit23/package_rater/internal/parser"
 )
 
 func main() {

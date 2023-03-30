@@ -1,17 +1,18 @@
-package api
+package github_apis
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"group-24-ECE461/internal/config"
-	"group-24-ECE461/internal/error"
-	"group-24-ECE461/internal/helper"
-	"group-24-ECE461/internal/models"
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/packit461/packit23/package_rater/internal/config"
+	"github.com/packit461/packit23/package_rater/internal/error"
+	"github.com/packit461/packit23/package_rater/internal/helper"
+	"github.com/packit461/packit23/package_rater/internal/models"
 
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
@@ -20,14 +21,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-//TODO:
-//identify all the endpoints needed:
+// TODO:
+// identify all the endpoints needed:
 //
-//Ramp-up Time: parse or use regex on readme to get installation, quickstart, docs and url ;; using REST API
-//Correctness: number of stargazers, found in Repository ;; using GraphQL API
-//Bus Factor: Total commits, and top 5 contributors ;; using REST API
-//Responsiveness: pull requests in the last week to open issues in the last week ;; using REST API
-//License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
+// Ramp-up Time: parse or use regex on readme to get installation, quickstart, docs and url ;; using REST API
+// Correctness: number of stargazers, found in Repository ;; using GraphQL API
+// Bus Factor: Total commits, and top 5 contributors ;; using REST API
+// Responsiveness: pull requests in the last week to open issues in the last week ;; using REST API
+// License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
 
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {

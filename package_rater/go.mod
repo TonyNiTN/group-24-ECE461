@@ -1,9 +1,10 @@
-module group-24-ECE461
+module github.com/packit461/packit23/package_rater
 
 go 1.19
 
 require (
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/shurcooL/githubv4 v0.0.0-20221229060216-a8d4a561cc93
 	go.uber.org/zap v1.24.0
 	golang.org/x/oauth2 v0.4.0
@@ -14,7 +15,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect

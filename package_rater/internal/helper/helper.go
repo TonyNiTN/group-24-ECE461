@@ -2,11 +2,12 @@ package helper
 
 import (
 	"encoding/base64"
-	"group-24-ECE461/internal/logger"
 	"sort"
 	"strings"
 	"time"
+
 	"github.com/google/go-github/github"
+	"github.com/packit461/packit23/package_rater/internal/logger"
 )
 
 func Base64Decode(str string) string { // function to decode a base64 encoded string
@@ -44,7 +45,7 @@ func GetLastWeek() string { // function to get the day 1 week before today. Retu
 }
 
 func GetOwnerAndName(url string) (owner string, name string) {
-	parts := strings.Split(url, ".com/") 	
+	parts := strings.Split(url, ".com/")
 	if len(parts) == 1 {
 		return "", ""
 	}
