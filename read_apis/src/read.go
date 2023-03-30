@@ -17,7 +17,6 @@ import (
 // Get the packages from the registry
 func handle_packages(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-
 }
 
 // Return this package (ID)
