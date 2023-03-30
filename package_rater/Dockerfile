@@ -18,9 +18,9 @@ COPY internal ./internal
 COPY tests ./tests
 
 # unsure how to build this app
-RUN go build -o /package_rater_app
+# RUN go build -o /package_rater_app
 
 # for web app purposes
-EXPOSE 8080
+# EXPOSE 8080
 
-CMD ["/package_rater_app"]
+# CMD ["/package_rater_app"]

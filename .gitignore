@@ -69,3 +69,6 @@ coverage_*
 
 # gcp or terraform credentials
 credentials/
+
+# flask extra data
+*.egg-info

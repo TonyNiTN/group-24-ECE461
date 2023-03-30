@@ -10,5 +10,7 @@ COPY . /app
 
 ENV PORT 8080
 
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+RUN pip3 install -e .
+
+ENTRYPOINT ["flask"]
+CMD ["--app", "src", "run", "-p", "8080"]
