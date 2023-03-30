@@ -20,9 +20,9 @@ RUN go mod download
 COPY . /app/
 
 # unsure how to build this app
-RUN go build -o /package_rater_app
+# RUN go build -o /package_rater_app
 
 # for web app purposes
 EXPOSE 8080
 
-CMD ["/package_rater_app"]
+# CMD ["/package_rater_app"]
