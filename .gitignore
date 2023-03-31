@@ -1,4 +1,25 @@
+### Custom Folders to Ignore ###
+
+# Misc
+.vscode
 .env
+.DS_Store
+
+# Store private keys (GCP or Terraform credentials)
+credentials/ 
+
+
+###########################################
+############  Build Artifacts   ###########
+###########################################
+
+# coverage reports
+coverage_*
+.coverage
+.pytest_cache
+
+# flask extra data
+*.egg-info
 
 # Binaries for programs and plugins
 *.exe
@@ -16,16 +37,27 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 log
-
 **/*.log
 
-.DS_Store
 
+
+
+###########################################
+##################  CI   ##################
+###########################################
 
 # additions for testing (emile)
 deps.txt
 node_modules
 todo.txt
+
+
+
+
+
+###########################################
+################ Terraform ################
+###########################################
 
 # Local .terraform directories
 */.terraform/
@@ -33,6 +65,7 @@ todo.txt
 # .tfstate files
 *.tfstate
 .tfstate.
+terraform/terraform.tfstate.backup
 
 # Crash log files
 crash.log
@@ -61,14 +94,3 @@ _override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
-# coverage reports
-coverage_*
-.coverage
-.pytest_cache
-
-# gcp or terraform credentials
-credentials/
-
-# flask extra data
-*.egg-info
