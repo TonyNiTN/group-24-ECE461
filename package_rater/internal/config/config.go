@@ -15,9 +15,9 @@ type Config struct {
 
 // NewConfig creates a new Config and reads the environment variables
 func NewConfig() *Config {
-	viper.SetDefault("LOG_LEVEL", "0")
+	viper.SetDefault("LOG_LEVEL", "2")
 	viper.SetDefault("GITHUB_TOKEN", "")
-	viper.SetDefault("LOG_FILE", "logfile.log")
+	viper.SetDefault("LOG_FILE", "C:/Users/mmcho/ECE461/packit23/logfile.log")
 	viper.AutomaticEnv()
 
 	return &Config{

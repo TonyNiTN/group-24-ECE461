@@ -21,13 +21,33 @@ func TestCreateRESTClient(t *testing.T) { // test CreateRESTClient function in t
 	}
 }
 
-func TestCreasteGQLClient(t *testing.T) { // test CreateGQLClient function in the api package
+func TestCreateGQLClient(t *testing.T) { // test CreateGQLClient function in the api package
 	client, ctx := CreateGQLClient()
 
 	if client == nil || ctx == nil {
 		t.Error("Error creating GraphQL client!")
 	}
 }
+
+// func TestCreateBuildDependenciesQuery(t *testing.T) {
+// 	c := cache.New(5*time.Minute, 10*time.Minute)
+
+// 	client, ctx := CreateGQLClient()
+// 	repo := models.NewRepository()
+// 	repo.Owner = "nodejs" /// testing
+// 	repo.Name = "node"
+// 	logger, _ := logger.InitLogger()
+// 	query := buildDependenciesQuery(client, ctx, repo, logger, c)
+
+// 	if ok := len(query) > 0; !ok {
+// 		fmt.Println("the length is 0")
+// 		t.Error("Error making dependencies query!")
+// 	} else {
+// 		// bs, _ := json.Marshal(query)
+// 		fmt.Println(query)
+// 	}
+
+// }
 
 func TestGetPullRequests(t *testing.T) { // test GetPullRequests function in the api package
 	c := cache.New(5*time.Minute, 10*time.Minute)
@@ -113,6 +133,26 @@ func TestGetStars(t *testing.T) { // test GetStars function in the api package
 		t.Error("Error getting stargazers count!")
 		fmt.Println()
 	}
+	// fmt.Println(repo.StarsCount)
+}
+
+func TestGetDependencyQuery(t *testing.T) {
+	c := cache.New(5*time.Minute, 10*time.Minute)
+
+	client, ctx := CreateGQLClient()
+	repo := models.NewRepository()
+	var OWNER string = "nodejs"
+	var NAME string = "node"
+	repo.Owner = OWNER
+	repo.Name = NAME
+	logger, _ := logger.InitLogger()
+	GetDependencyQuery(client, ctx, repo, logger, c)
+	val := interface{}(repo.DependencyCount)
+	if _, ok := val.(int); !ok {
+		t.Error("Error getting dependency count!")
+		fmt.Println()
+	}
+	fmt.Printf("%T", val)
 }
 
 func TestGetReadme(t *testing.T) { // test GetReadme function in the api package

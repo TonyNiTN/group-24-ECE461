@@ -32,6 +32,8 @@ func TestCalculateRampUpTime(t *testing.T) {
 
 	if repo.RampUpTimeScore < 0.0 {
 		t.Error("Ramp Up Time score can't be less than 0")
+	} else {
+		fmt.Println(repo.RampUpTimeScore)
 	}
 }
 

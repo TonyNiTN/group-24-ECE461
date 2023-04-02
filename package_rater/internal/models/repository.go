@@ -15,6 +15,8 @@ type Repository struct {
 	OpenPRs                   int     `json:"openPullRequests"` // Used in the calculation of responsiveness score
 	TopContributions          int     `json:"topContributions"` // Used in the calculation of bus factor score
 	Commits                   int     `json:"commits"`          // Used in the calculation of bus factor score
+	DependencyCount           int     `json:"dependencyCount"`  //
+	PinnedVersions            int     `json:"pinnedVersions"`   //
 	License                   string  `json:"license"`          // Used in the calculation of license compatibility score
 	Readme                    string  `json:"readme"`           // Used in the calculation of ramp up time score
 	RampUpTimeScore           float64 `json:"rampUpTimeScore"`
@@ -22,6 +24,7 @@ type Repository struct {
 	BusFactorScore            float64 `json:"busFactorScore"`
 	ResponsivenessScore       float64 `json:"responsivenessScore"`
 	LicenseCompatibilityScore float64 `json:"licenseCompatibilityScore"`
+	VersionScore              float64 `json:"versionScore"`
 	NetScore                  float64 `json:"netScore"`
 	NetPercentage             float64 `json:"netPercentage"`
 }
@@ -34,6 +37,7 @@ type Package struct {
 	BusFactorScore            float64 `json:"BUS_FACTOR_SCORE"`
 	ResponsivenessScore       float64 `json:"RESPONSIVENESS_MAINTAINER_SCORE"`
 	LicenseCompatibilityScore float64 `json:"LICENSE_SCORE"`
+	VersionScore              float64 `json:"VERSION_SCORE"`
 }
 
 func NewRepository() *Repository { // Initialize empty *Repository object
@@ -69,6 +73,7 @@ func ShowResults(repos []*Repository) {
 			BusFactorScore:            float64(int(repo.BusFactorScore*100)) / 100,
 			ResponsivenessScore:       float64(int(repo.ResponsivenessScore*100)) / 100,
 			LicenseCompatibilityScore: float64(int(repo.LicenseCompatibilityScore*100)) / 100,
+			VersionScore:              float64(int(repo.VersionScore*100)) / 100,
 		}
 
 		data = append(data, m)

@@ -66,6 +66,8 @@ func Score(urlLinks []string, logger *zap.Logger) {
 			repo.Name = name
 			repo.Owner = owner
 			repo.Url = url
+			repo.DependencyCount = 0
+			repo.PinnedVersions = 0
 			flag := api.SendRequests(client, graphqlClient, ctx, graphqlCtx, repo, logger, c)
 			if flag != 0 {
 				continue
