@@ -4,6 +4,8 @@
 .vscode
 .env
 .DS_Store
+*/cache.txt
+*/log.txt
 
 # Store private keys (GCP or Terraform credentials)
 credentials/ 

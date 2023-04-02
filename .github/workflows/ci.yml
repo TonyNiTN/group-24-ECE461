@@ -67,15 +67,15 @@ jobs:
       - name: Build package rater container 
         run: |
           docker build package_rater/ -t package_rater_img
-          docker run -p 8080:8080 --name package_rater_container package_rater_img
+          docker run -d -p 8080:8080 --name package_rater_container package_rater_img
       - name: Build delete/write container 
         run: |
           docker build delete_write_apis/ -t delete_write_img
-          docker run -p 8080:8080 --name delete_write_container delete_write_img
+          docker run -d -p 8080:8080 --name delete_write_container delete_write_img
       - name: Build read container
         run: |
           docker build read_apis/ -t read_img
-          docker run -p 8080:8080 --name read_container read_img
+          docker run -d -p 8080:8080 --name read_container read_img
       - name: Test running containers
         run: |
           echo "Include a script for integration testing"
