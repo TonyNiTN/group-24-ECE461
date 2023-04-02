@@ -39,6 +39,11 @@ var flag int = 0
 
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {
 	flag = 0
+
+	GetDependencyQuery(graphqlClient, ctx, repo, logger, cache)
+	if flag == 1 {
+		return flag
+	}
 	GetStars(graphqlClient, ctx, repo, logger, cache)
 	if flag == 1 {
 		return flag
@@ -113,12 +118,23 @@ func CreateRESTClient() (*github.Client, context.Context) { // function to creat
 }
 
 func CreateGQLClient() (*githubv4.Client, context.Context) { // function to creategithub GraphQL api client
+	// ctx := context.Background() // create empty context
+	// cfg := config.NewConfig()
+	// ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
+	// tc := oauth2.NewClient(ctx, ts)                                             // create new http client
+	// graphqlClient := githubv4.NewClient(tc)                                     // create new github graphql api client from the http client template
+
 	ctx := context.Background() // create empty context
 	cfg := config.NewConfig()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
 	tc := oauth2.NewClient(ctx, ts)                                             // create new http client
-	graphqlClient := githubv4.NewClient(tc)                                     // create new github graphql api client from the http client template
-	return graphqlClient, ctx                                                   // returns the github graphql api client and the empty context
+	headers := map[string]string{
+		"Accept": "application/vnd.github.hawkgirl-preview+json", // changed headers to enable dependency graph preview
+	}
+	tc = NewHTTPClientWithHeaders(tc.Transport, headers)
+	graphqlClient := githubv4.NewClient(tc) // create new github graphql api client from the http client template
+
+	return graphqlClient, ctx // returns the github graphql api client and the empty context
 }
 
 func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) { // function to make get request for pull requests
@@ -144,54 +160,14 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 
 }
 
-// func buildDependenciesQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) (query map[string]string) {
-// 	// going to ignore cache stuff for now
-// 	var dependenciesQuery = map[string]string{
-// 		"query": `
-// 		{
-// 			repository(owner:` + `"` + repo.Owner + `", name:` + `"` + repo.Name + `") {
-// 			  dependencyGraphManifests {
-// 				totalCount
-// 				nodes {
-// 				  filename
-// 				}
-// 				edges {
-// 				  node {
-// 					blobPath
-// 					dependencies {
-// 					  totalCount
-// 					  nodes {
-// 						packageName
-// 						requirements
-// 						hasDependencies
-// 						packageManager
-// 					  }
-// 					}
-// 				  }
-// 				}
-// 			  }
-// 			}
-// 		  }`,
-// 	}
-// 	return dependenciesQuery
-// }
-
 func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) {
-	// query := buildDependenciesQuery(client, ctx, repo, logger, c)
-	// jsonValue, _ := json.Marshal(query)
-	// req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
-	// http_client := &http.Client{Timeout: time.Second * 10}
-	// res, err := http_client.Do(req)
-	// if err != nil {
-	// 	return 0, fmt.Errorf("The GraphQL query failed with error %s\n", err)
-	// }
-	// defer res.Body.Close()
-	// return 0, nil
+
 	variables := map[string]interface{}{ // variables to dynamically populate the graphql query structure
 		"owner": githubv4.String(repo.Owner),
 		"name":  githubv4.String(repo.Name),
 	}
 	err := client.Query(ctx, &models.Dependency, variables)
+
 	if err != nil {
 		flag = 1
 		newError := error.NewRequestError("GraphQL", err.Error(), 400)
@@ -199,7 +175,30 @@ func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *mode
 		logger.Info(newError.Error())
 		return
 	}
-	repo.DependencyCount = models.Dependency.Repository.DependencyGraphManifests.TotalCount
+	// numNodes := models.Dependency.Repository.DependencyGraphManifests.TotalCount
+	numNodes := len(models.Dependency.Repository.DependencyGraphManifests.Nodes)
+
+	edges := models.Dependency.Repository.DependencyGraphManifests.Edges
+	re, _ := regexp.Compile(">|>=|<|<=|`^`")
+	// logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
+	for i := 0; i < numNodes; i++ {
+		dependency := edges[i].Node.Dependencies
+		repo.DependencyCount += dependency.TotalCount
+		logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
+		for j := 0; j < dependency.TotalCount; j++ {
+			requirement := dependency.Nodes[j].Requirements
+			matched := re.MatchString(requirement) // cases where major + minor version is NOT pinned
+			if !matched {
+				repo.PinnedVersions += 1
+			}
+		}
+	}
+
+	// logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
+	// logger.Info(fmt.Sprintf("Version score: %f", repo.VersionScore))
+	// logger.Info(fmt.Sprintf("numNodes: %d", numNodes))
+
+	// logger.Info(fmt.Sprintf("%+v\n", models.Dependency.Repository))
 
 }
 
