@@ -17,20 +17,20 @@ var Stars struct { // graphql query structure to get stargazers count of a repos
 var Dependency struct {
 	Repository struct {
 		DependencyGraphManifests struct {
-			TotalCount int
-			Nodes      struct {
-				FileName string
+			TotalCount int `json:"totalCount"`
+			Nodes      []struct {
+				Filename string `json:"filename"`
 			}
-			Edges struct {
+			Edges []struct {
 				Node struct {
-					BlobPath     string
+					BlobPath     string `json:"blobPath"`
 					Dependencies struct {
 						TotalCount int `json:"dependencyCount"`
-						Nodes      struct {
-							PackageName     string
-							Requirements    string
-							HasDependencies bool
-							PackageManager  string
+						Nodes      []struct {
+							PackageName     string `json:"packageName"`
+							Requirements    string `json:"requirements"`
+							HasDependencies bool   `json:"hasDependencies"`
+							PackageManager  string `json:"packageManager"`
 						}
 					}
 				}

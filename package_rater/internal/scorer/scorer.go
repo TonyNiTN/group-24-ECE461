@@ -34,7 +34,7 @@ func CalculateNetScore(repo *models.Repository) {
 }
 
 func CalculateVersionScore(repo *models.Repository) {
-	score := float64(repo.DependencyCount)
+	score := float64(repo.PinnedVersions) / float64(repo.DependencyCount)
 
 	repo.VersionScore = score
 }
