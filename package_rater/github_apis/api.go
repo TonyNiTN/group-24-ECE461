@@ -117,6 +117,12 @@ func CreateRESTClient() (*github.Client, context.Context) { // function to creat
 }
 
 func CreateGQLClient() (*githubv4.Client, context.Context) { // function to creategithub GraphQL api client
+	// ctx := context.Background() // create empty context
+	// cfg := config.NewConfig()
+	// ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
+	// tc := oauth2.NewClient(ctx, ts)                                             // create new http client
+	// graphqlClient := githubv4.NewClient(tc)                                     // create new github graphql api client from the http client template
+
 	ctx := context.Background() // create empty context
 	cfg := config.NewConfig()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
