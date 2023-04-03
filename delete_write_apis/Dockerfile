@@ -13,5 +13,5 @@ ENV PORT 8080
 RUN pip3 install -e .
 
 # commenting because makes ci run indefinitely
-# ENTRYPOINT ["flask"]
-# CMD ["--app", "src", "run", "-p", "8080"]
+ENTRYPOINT ["flask"]
+CMD ["--app", "src", "run", "-h", "0.0.0.0", "-p", "8080"]
