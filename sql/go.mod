@@ -1,4 +1,4 @@
-module sql
+module github.com/packit461/packit23/sql
 
 go 1.19
 
