@@ -28,28 +28,18 @@ import (
 	sql_driver "github.com/go-sql-driver/mysql"
 )
 
-// func connect() {
-// 	print("test")
-// 	cleanup, err := mysql.RegisterDriver("cloudsql-mysql", cloudsqlconn.WithCredentialsFile("key.json"))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	// call cleanup when you're done with the database connection
-// 	defer cleanup()
-
-// 	db, err := sql.Open(
-// 		"cloudsql-mysql",
-// 		"myuser:mypass@cloudsql-mysql(project:region:instance)/mydb",
-// 	)
-
-// 	if db != nil {
-// 		fmt.Print("Db not nil!")
-// 	}
-
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+func connect_test_db() (*sql.DB, error) {
+	db, err := sql.Open(
+		"mysql",
+		"db_user:oldpassword!!!@tcp(127.0.0.1:3306)/test_db",
+	)
+	if err != nil {
+		log.Fatal(err)
+		print("FATAL")
+		return nil, fmt.Errorf("sql.Open: %v", err)
+	}
+	return db, nil
+}
 
 func connect() (*sql.DB, error) {
 	mustGetenv := func(k string) string {
@@ -67,8 +57,6 @@ func connect() (*sql.DB, error) {
 		project  = mustGetenv("PROJECT_ID")
 		region   = mustGetenv("REGION")
 		instance = mustGetenv("INSTANCE_NAME")
-
-		usePrivate = os.Getenv("PRIVATE_IP")
 	)
 
 	var instanceConnectionName = project + region + instance
@@ -78,9 +66,6 @@ func connect() (*sql.DB, error) {
 		return nil, fmt.Errorf("cloudsqlconn.NewDialer: %v", err)
 	}
 	var opts []cloudsqlconn.DialOption
-	if usePrivate != "" {
-		opts = append(opts, cloudsqlconn.WithPrivateIP())
-	}
 	sql_driver.RegisterDialContext("cloudsqlconn",
 		func(ctx context.Context, addr string) (net.Conn, error) {
 			return d.Dial(ctx, instanceConnectionName, opts...)
@@ -103,11 +88,11 @@ func return_error_packet(w http.ResponseWriter, r *http.Request) {
 
 // Get the packages from the registry
 func handle_packages(w http.ResponseWriter, r *http.Request) {
-	db, err := connect()
+	//db, err := connect()
+	db, err := connect_test_db()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
 
 	//logger.Info(fmt.Sprintf("Received %s request", r.Method))
 	headers := "Headers:\n"
@@ -115,7 +100,6 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 		headers += fmt.Sprintf("%s=%s\n", key, value)
 	}
 	//logger.Info(headers)
-
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		//logger.Info("\nError reading body of request\n")
@@ -129,6 +113,7 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	print("res is: ", res, "\n")
 	defer res.Close()
 
 	// --------- DEBUGGING/EXPERIMENTAL CODE TO VIEW RETURN ---------
@@ -158,12 +143,12 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 
 // Return this package (ID)
 func handle_packages_id(w http.ResponseWriter, r *http.Request) {
-	db, err := connect()
-
+	//db, err := connect()
+	db, err := connect_test_db()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	//defer db.Close()
 	// logger.Info(fmt.Sprintf("Received %s request", r.Method))
 	headers := "Headers:\n"
 	for key, value := range r.Header {
