@@ -163,7 +163,7 @@ func handle_packages_id(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := db.Query(`SELECT ID, NAME, VERSION FROM Registry;`)
+	res, err := db.Query("SELECT ID, NAME, VERSION FROM Registry WHERE ID ==" + id + ";")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func handle_packages_id(w http.ResponseWriter, r *http.Request) {
 							A.URL 
 							B.JS_PROGRAM
 							FROM Registry AS A
-							WHERE A.ID == id
+							WHERE A.ID == ` + id + `
 							INNER JOIN Binaries AS B
 								ON A.BINARY_PIK == B.ID
 							END;`)
