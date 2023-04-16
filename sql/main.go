@@ -116,6 +116,7 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	print("res is: ", res, "\n")
 	defer res.Close()
 
+	w.WriteHeader(200)
 	// --------- DEBUGGING/EXPERIMENTAL CODE TO VIEW RETURN ---------
 	for res.Next() {
 		//check for correct indexing
@@ -130,16 +131,6 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	}
 	// --------------------------------------------------------------
 }
-
-// `BEGIN
-//	SELECT * FROM Registry AS A
-//	INNER JOIN Binaries AS B
-//		ON A.BINARY_PK = B.ID
-//	INNER JOIN Users AS C
-//		ON A.USER_PK = C.ID
-//	INNER JOIN Ratings AS D
-//		ON A.RATING_PK = D.ID
-//	END;`
 
 // Return this package (ID)
 func handle_packages_id(w http.ResponseWriter, r *http.Request) {
@@ -204,12 +195,61 @@ func handle_packages_id(w http.ResponseWriter, r *http.Request) {
 
 // Return the rating. Only use this if each metric was computed successfully.
 func handle_packages_rate(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	db, err := connect_test_db()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Get the Requested package's ID
+	headers := "Headers:\n"
+	for key, value := range r.Header {
+		headers += fmt.Sprintf("%s=%s\n", key, value)
+	}
+	// logger.Info(headers)
+	id := r.Header.Get("Id")
+	if id == "" {
+		// logger.Info("\nNo Matching Value to key Id\n")
+		return_error_packet(w, r)
+
+		w.WriteHeader(404)
+		return
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := db.Query(`BEGIN SELECT 
+						A.BUS_FACTOR,
+						A.CORRECTNESS,
+						A.RAMP_UP,
+						A.RESPONSIVENESS,
+						A.LICENSE_SCORE,
+						A.PINNING_PRACTICE,
+						A.PULL_REQUEST,
+						A.NET_SCORE
+						FROM Rating AS A
+						WHERE B.ID == ` + id + `
+						INNER JOIN Registry AS B
+							ON A.ID == B.RATING_PK
+						END;`)
+	var ratings models.PackageRating
+	err = res.Scan(&ratings.BusFactor, &ratings.Correctness, &ratings.RampUp, &ratings.ResponsiveMaintainer, &ratings.LicenseScore, &ratings.GoodPinningPractice, &ratings.PullRequest, &ratings.NetScore)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(400)
+	}
+	ratingsJson, err := json.Marshal(ratings)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(500)
+	}
+	w.Write(ratingsJson)
+	w.WriteHeader(200)
 }
 
 // Return the history of this package (all versions).
 func handle_packages_byname(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+
 }
 
 func main() {
