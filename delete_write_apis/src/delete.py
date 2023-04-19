@@ -4,25 +4,51 @@ APIs for DELETE methods:
 /package/(id)
 /package/byName/(name)
 """
-from src import app
 
-# FOR TESTING PURPOSES
-@app.route("/", methods=["GET"])
-def test():
-    """Func description"""
-    return "Hello"
+import json
 
-@app.route("/reset", methods=["DELETE"])
-def reset():
-    """Func description"""
-    return "Reset"
+from fastapi import APIRouter, Request, HTTPException
 
-@app.route("/package/<string:id>", methods=["DELETE"])
-def package_id_delete(id):
-    """Func description"""
-    return "Package by ID"
+from . import authentication, helper
 
-@app.route("/package/byName/<string:id>", methods=["DELETE"])
-def package_byname_delete(id):
-    """Func description"""
-    return "Package by name"
+router = APIRouter()
+
+@router.get("/delete")
+def delete_root():
+    return {"Hello": "Delete"}
+
+@router.delete('/reset', response_model=None)
+async def registry_reset(request: Request) -> None:
+    # Parse request
+    try:
+        token = request.headers["X-Authorization"]
+        userid = authentication.validate_jwt(token)
+        assert userid != None
+
+    except Exception:
+        print(f"There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid: {traceback.print_exc()}")
+        raise HTTPException(status_code=400, detail="There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.")
+
+    print(f"reset requested by {userid}")
+
+# @router.delete('/package/byName/{name}', response_model=None)
+# def package_by_name_delete(
+#     name: PackageName,
+#     name: PackageName = ...,
+#     x__authorization: AuthenticationToken = Header(..., alias='X-Authorization'),
+# ) -> None:
+#     """
+#     Delete all versions of this package.
+#     """
+#     pass
+
+# @router.delete('/package/{id}', response_model=None)
+# def package_delete(
+#     id: PackageID,
+#     id: PackageID = ...,
+#     x__authorization: AuthenticationToken = Header(..., alias='X-Authorization'),
+# ) -> None:
+#     """
+#     Delete this version of the package.
+#     """
+#     pass
