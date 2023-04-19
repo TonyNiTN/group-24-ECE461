@@ -6,18 +6,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 <script src=”https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js”></script>
 <script type=”text/javascript” src=”https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js”></script>
-<script src="js/registry.js" type="text/javascript" defer></script>
+<!-- <script src="js/registry.js" type="text/javascript" defer></script> -->
+<script src="js/package.js" type="text/javascript" defer></script>
 <script src="components/header.js" type="text/javascript" defer></script>
 <script src="components/footer.js" type="text/javascript" defer></script>
 <header-component></header-component>
 
-<body>
+<body onload="javascript:setupPage()">
     <div class="container">
         <div class="row">
             <div class="col-md-9 card">
                 <div class="m-2">
                     <h2>Package Info</h2>
                     <div class=" mb-3 form-group">
+                        <label for="IDSlot">ID:</label>
+                        <input type="text" class="form-control mb-3" id="IDSlot" placeholder="ID not found"
+                            disabled>
                         <label for="NameSlot">Package Name:</label>
                         <input type="text" class="form-control mb-3" id="NameSlot" placeholder="Name not found"
                             disabled>
@@ -44,6 +48,9 @@
                 <div class="m-2">
                     <h2>Rating Pane</h2>
                     <div class="form-group">
+                        <label for="RatingIDSlot">Rating ID:</label>
+                        <input type="text" class="form-control" id="RatingIDSlot" placeholder="not found"
+                            disabled>
                         <label for="BusFactorSlot">Bus Factor:</label>
                         <input type="text" class="form-control" id="BusFactorSlot" placeholder="not found" disabled>
                         <label for="CorrectnessSlot">Correctness:</label>
