@@ -23,10 +23,11 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 	//"reflect"
 	//"regexp"
-
 	"github.com/Masterminds/semver"
+	"github.com/golang-jwt/jwt"
 	"github.com/packit461/packit23/sql/models"
 
 	//"github.com/packit461/packit23/package_rater/internal/logger"
@@ -109,6 +110,28 @@ func return_413_packet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("413 - Request entity too large"))
 }
 
+func verifyJWT(endpointHandler func(writer http.ResponseWriter, request *http.Request)) http.HandlerFunc {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.Header["Token"] != nil {
+			token, err := jwt.Parse(request.Header["X-Authorization"][0], func(token *jwt.Token) (interface{}, error) {
+				_, ok := token.Method.(*jwt.SigningMethodHMAC)
+				if !ok {
+					return_400_packet(writer, request)
+				}
+				return "", nil
+			})
+			if err != nil {
+				return_400_packet(writer, request)
+			}
+			if token.Valid {
+				endpointHandler(writer, request)
+			} else {
+				return_400_packet(writer, request)
+			}
+		}
+	})
+}
+
 // return all versions of package name in db
 func getMetadataFromName(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
 	var metadataList []models.PackageMetadata
@@ -130,21 +153,14 @@ func getMetadataFromName(db *sql.DB, query models.PackageQuery) ([]models.Packag
 /*
 // Get the packages from the registry
 Missing:
-- Authentication
 - Pagination
 */
 func handle_packages(w http.ResponseWriter, r *http.Request) {
-	// check authentication
-	headers := "Headers:\n"
-	for key, value := range r.Header {
-		headers += fmt.Sprintf("%s=%s\n", key, value)
-	}
-
-	//logger.Info(headers)
 	//db, err := connect()
 	db, err := connect_test_db()
 	if err != nil {
 		log.Fatal(err)
+		return_500_packet(w, r)
 	}
 
 	//logger.Info(fmt.Sprintf("Received %s request", r.Method))
@@ -161,8 +177,8 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	var ret []models.PackageMetadata
 	err = json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		log.Fatal("\nError reading body of request\n")
 		return_404_packet(w, r)
+		log.Fatal("\nError reading body of request\n")
 	}
 	for _, q := range body.Items {
 		response_arr = append(response_arr, models.PackageQuery{q.Name, q.Version})
@@ -172,22 +188,22 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 		// make version field a range to look for
 		c, err := semver.NewConstraint(response.Version)
 		if err != nil {
-			log.Fatal(err)
 			return_400_packet(w, r)
+			log.Fatal(err)
 		}
 
 		// query all versions of a package if found in db
 		metadataList, err := getMetadataFromName(db, response)
 		if err != nil {
-			log.Fatal(err)
 			return_400_packet(w, r)
+			log.Fatal(err)
 		}
 		// check which version is in range
 		for _, md := range metadataList {
 			v, err := semver.NewVersion(md.Version)
 			if err != nil {
-				log.Fatal(err)
 				return_500_packet(w, r)
+				log.Fatal(err)
 			}
 			if c.Check(v) {
 				ret = append(ret, md)
@@ -195,7 +211,7 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	print("ret: ", ret, "\n")
+	//print("ret: ", ret, "\n")
 
 	if ret == nil {
 		return_400_packet(w, r)
@@ -314,27 +330,106 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 	var ratings models.PackageRating
 	err = res.Scan(&ratings.BusFactor, &ratings.Correctness, &ratings.RampUp, &ratings.ResponsiveMaintainer, &ratings.LicenseScore, &ratings.GoodPinningPractice, &ratings.PullRequest, &ratings.NetScore)
 	if err != nil {
+		return_400_packet(w, r)
 		log.Fatal(err)
-		w.WriteHeader(400)
+
 	}
 	ratingsJson, err := json.Marshal(ratings)
 	if err != nil {
+		return_500_packet(w, r)
 		log.Fatal(err)
-		w.WriteHeader(500)
 	}
 	w.Write(ratingsJson)
 	w.WriteHeader(200)
 }
 
 // Return the history of this package (all versions).
-func handle_package_byname(w http.ResponseWriter, r *http.Request) {
-	// db, err := connect_test_db()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// vars := mux.Vars(r)
-	// id := vars["name"]
+/*
 
+type User struct {
+	Name string `json:"name"`
+	// Is this user an admin?
+	IsAdmin bool `json:"isAdmin"`
+}
+
+type PackageMetadata struct {
+	ID   string `json:"ID"`
+	Name string `json:"Name"`
+	// Package version
+	Version string `json:"Version"`
+}
+
+type PackageHistoryEntry struct {
+	User *User `json:"User"`
+	// Date of activity using ISO-8601 Datetime standard in UTC format.
+	Date time.Time `json:"Date"`
+
+	PackageMetadata *PackageMetadata `json:"PackageMetadata"`
+
+	Action string `json:"Action"`
+}
+*/
+
+// registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL)
+// User - go into Users
+// Date - go into Registry(UPLOADED)
+// PackageMetadata - go into Registry(ID,NAME,VERSION)
+// Action - not ready yet
+// db needs to link package name with the User who uploaded and add Action (somewhere)
+
+// return the package history with package name from path
+func handle_package_byname(w http.ResponseWriter, r *http.Request) {
+	db, err := connect_test_db()
+	if err != nil {
+		return_500_packet(w, r)
+		log.Fatal(err)
+	}
+	vars := mux.Vars(r)
+	name := vars["name"]
+	if name == "" {
+		return_404_packet(w, r)
+	}
+	var ret []models.PackageHistoryEntry
+	var metadataList []models.PackageMetadata
+	var times []time.Time
+	// get registry entry from name
+	rows, err := db.Query("SELECT ID, NAME, VERSION, UPLOADED FROM Registry WHERE NAME = ?", name)
+	if err != nil {
+		return_500_packet(w, r)
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	// get all versions of named package
+	for rows.Next() {
+		var time time.Time
+		var md models.PackageMetadata
+		if err := rows.Scan(&md.ID, &md.Name, &md.Version, &time); err != nil {
+			// package with name not found
+			return_500_packet(w, r)
+			log.Fatal(err)
+		}
+		metadataList = append(metadataList, md)
+		times = append(times, time)
+	}
+
+	// iterate through versions of package and get rest of history
+	for i, md := range metadataList {
+		print("\n")
+		var history models.PackageHistoryEntry
+		history.User = &models.User{Name: "test", IsAdmin: false}
+		history.Date = times[i]
+		history.PackageMetadata = &md
+		history.Action = "Uploaded"
+		print(history.PackageMetadata.Name, history.PackageMetadata.Version, history.PackageMetadata.ID, history.User.Name, history.User.IsAdmin, history.Action)
+		print("\n")
+	}
+
+	retJson, err := json.Marshal(ret)
+	if err != nil {
+		return_500_packet(w, r)
+		log.Fatal(err)
+	}
+	w.Write(retJson)
 }
 
 func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
@@ -343,11 +438,11 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/packages", handle_packages)
-	router.HandleFunc("/package/{id}", handle_package_id)
-	router.HandleFunc("/package/{id}/rate", handle_package_rate)
-	router.HandleFunc("/package/byName/{name}", handle_package_byname)
-	router.HandleFunc("/package/byRegEx", handle_package_byregex)
+	router.HandleFunc("/packages", verifyJWT(handle_packages))
+	router.HandleFunc("/package/{id}", verifyJWT(handle_package_id))
+	router.HandleFunc("/package/{id}/rate", verifyJWT(handle_package_rate))
+	router.HandleFunc("/package/byName/{name}", (handle_package_byname))
+	router.HandleFunc("/package/byRegEx", verifyJWT(handle_package_byregex))
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
