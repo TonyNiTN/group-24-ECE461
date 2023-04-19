@@ -24,8 +24,9 @@ import (
 	"net/http"
 	"os"
 	//"reflect"
-	"regexp"
+	//"regexp"
 
+	"github.com/Masterminds/semver"
 	"github.com/packit461/packit23/sql/models"
 
 	//"github.com/packit461/packit23/package_rater/internal/logger"
@@ -108,116 +109,29 @@ func return_413_packet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("413 - Request entity too large"))
 }
 
-// is there any case where packages are to be looked for in external registries?
-// return a list of packages (id, name, version) found in a database matching the versioning semantics of the given version
-func getPackagesExact(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
-	// find versions in db
-	rows, err := db.Query(`SELECT ID, NAME, VERSION FROM Registry WHERE NAME = ` + string(query.Name) + ` AND VERSION = ` + string(query.Version) + `;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	var metadata models.PackageMetadata
-	for rows.Next() {
-		if err := rows.Scan(&metadata.ID, &metadata.Name, &metadata.Version); err != nil {
-			return nil, fmt.Errorf("version of package not found. rows.Scan: %v", err)
-		}
-	}
-
-	var ret []models.PackageMetadata
-	ret = append(ret, metadata)
-	return ret, nil
-}
-
-// get a list of packages from db given a bounded range of versions
-func getPackagesRange(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
-	boundedRangeRegex := regexp.MustCompile(`(\d*\.\d*\.\d*)-(\d*\.\d*\.\d*)`)
-	boundedRangeMatch := boundedRangeRegex.FindStringSubmatch(query.Version)
-
-	begin := boundedRangeMatch[1]
-	end := boundedRangeMatch[2]
-
-	// find versions in db
-	rows, err := db.Query(`SELECT ID, NAME, VERSION FROM Registry WHERE NAME = ` + query.Name + ` AND VERSION >= ` + begin + `AND VERSION <= ` + end + `;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
+// return all versions of package name in db
+func getMetadataFromName(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
 	var metadataList []models.PackageMetadata
+	rows, err := db.Query("SELECT ID, NAME, VERSION FROM Registry WHERE NAME = ?;", query.Name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
 	for rows.Next() {
-		var metadata models.PackageMetadata
-		if err := rows.Scan(&metadata.ID, &metadata.Name, &metadata.Version); err != nil {
+		var md models.PackageMetadata
+		if err := rows.Scan(&md.ID, &md.Name, &md.Version); err != nil {
 			return nil, fmt.Errorf("version of package not found. rows.Scan: %v", err)
 		}
-		metadataList = append(metadataList, metadata)
+		metadataList = append(metadataList, md)
 	}
-
 	return metadataList, nil
 }
 
-// only major version must match. Any minor or patch version greater than or equal to the minimum is valid.
-// are versions getting correctly checked? since comparisons are with strings
-func getPackagesCarat(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
-	caratRegex := regexp.MustCompile(`\^(\d*\.\d*\.\d*)`)
-	caratMatch := caratRegex.FindStringSubmatch(query.Version)
-
-	begin := caratMatch[1]
-	// get major version and increment it
-	end := string(int(begin[0])+1) + ".0.0"
-
-	// find versions in db
-	rows, err := db.Query(`SELECT ID, NAME, VERSION FROM Registry WHERE NAME = ` + query.Name + ` AND VERSION >= ` + begin + ` AND VERSION < ` + end + `;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	var metadataList []models.PackageMetadata
-	for rows.Next() {
-		var metadata models.PackageMetadata
-		if err := rows.Scan(&metadata.ID, &metadata.Name, &metadata.Version); err != nil {
-			return nil, fmt.Errorf("version of package not found. rows.Scan: %v", err)
-		}
-		metadataList = append(metadataList, metadata)
-	}
-
-	return metadataList, nil
-}
-
-// For tilde ranges, major and minor versions must match those specified, but any patch version greater than or equal to the one specified is valid.
-func getPackagesTilde(db *sql.DB, query models.PackageQuery) ([]models.PackageMetadata, error) {
-	tildeRegex := regexp.MustCompile(`\~(\d*\.\d*\.\d*)`)
-	tildeMatch := tildeRegex.FindStringSubmatch(query.Version)
-
-	begin := tildeMatch[1]
-
-	// get minor version and increment it
-	end := string(begin[0]) + "." + string(int(begin[2])+1) + ".0"
-
-	// find versions in db
-	rows, err := db.Query(`SELECT ID, NAME, VERSION FROM Registry WHERE NAME = ` + query.Name + ` AND VERSION >= ` + begin + ` AND VERSION < ` + end + `;`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	var metadataList []models.PackageMetadata
-	for rows.Next() {
-		var metadata models.PackageMetadata
-		if err := rows.Scan(&metadata.ID, &metadata.Name, &metadata.Version); err != nil {
-			return nil, fmt.Errorf("version of package not found. rows.Scan: %v", err)
-		}
-		metadataList = append(metadataList, metadata)
-	}
-
-	return metadataList, nil
-}
-
-// Get the packages from the registry
 /*
+// Get the packages from the registry
 Missing:
 - Authentication
 - Pagination
-- Handling the case where "*" is passed as PackageQuery (enumerate all packages)
-- Handling the case where a package is not found
 */
 func handle_packages(w http.ResponseWriter, r *http.Request) {
 	// check authentication
@@ -254,55 +168,31 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 		response_arr = append(response_arr, models.PackageQuery{q.Name, q.Version})
 	}
 
-	// https://semver.org/
-	//validVersion := regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
-	exactRegex := regexp.MustCompile(`(\d*\.\d*\.\d*)`)
-	boundedRangeRegex := regexp.MustCompile(`(\d*\.\d*\.\d*)-(\d*\.\d*\.\d*)`)
-	caratRegex := regexp.MustCompile(`\^(\d*\.\d*\.\d*)`)
-	tildeRegex := regexp.MustCompile(`\~(\d*\.\d*\.\d*)`)
-
-	// get requested versions of packages
-	// TODO: ADD PAGINATION STUFF
 	for _, response := range response_arr {
-		//if validVersion.FindStringSubmatch(response.Version) != nil {
-		if boundedRangeRegex.FindStringSubmatch(response.Version) != nil {
-			list, err := getPackagesRange(db, response)
-			if err != nil {
-				log.Fatal(err)
-				return_404_packet(w, r)
-			}
-			ret = append(ret, list...)
-		} else if caratRegex.FindStringSubmatch(response.Version) != nil {
-			list, err := getPackagesCarat(db, response)
-			if err != nil {
-				log.Fatal(err)
-				return_404_packet(w, r)
-			}
-			ret = append(ret, list...)
-		} else if tildeRegex.FindStringSubmatch(response.Version) != nil {
-			list, err := getPackagesTilde(db, response)
-			if err != nil {
-				log.Fatal(err)
-				return_404_packet(w, r)
-			}
-			ret = append(ret, list...)
-			// checking exact version last because this regex is a subset of the other regexes
-		} else if exactRegex.FindStringSubmatch(response.Version) != nil {
-			list, err := getPackagesExact(db, response)
-			if err != nil {
-				log.Fatal(err)
-				return_404_packet(w, r)
-			}
-			ret = append(ret, list...)
-		} else {
-			print("goes here")
-			log.Fatal("Invalid version")
+		// make version field a range to look for
+		c, err := semver.NewConstraint(response.Version)
+		if err != nil {
+			log.Fatal(err)
 			return_400_packet(w, r)
 		}
-		// } else {
-		// 	log.Fatal("Invalid version")
-		// 	return_400_packet(w, r)
-		// }
+
+		// query all versions of a package if found in db
+		metadataList, err := getMetadataFromName(db, response)
+		if err != nil {
+			log.Fatal(err)
+			return_400_packet(w, r)
+		}
+		// check which version is in range
+		for _, md := range metadataList {
+			v, err := semver.NewVersion(md.Version)
+			if err != nil {
+				log.Fatal(err)
+				return_500_packet(w, r)
+			}
+			if c.Check(v) {
+				ret = append(ret, md)
+			}
+		}
 	}
 
 	print("ret: ", ret, "\n")
