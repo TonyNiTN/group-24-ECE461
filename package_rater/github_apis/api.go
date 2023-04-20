@@ -160,8 +160,71 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 
 }
 
+// func getDependencies(client *githubv4.Client, owner string, repo string, logger *zap.Logger) (opt []models.Dependency) {
+// 	var allDeps []models.Dependency
+// 	cursor := ""
+// 	count := 0
+// 	for {
+
+// 		query := `query($owner: String!, $repo: String!, $after: String) {
+//                 repository(owner: $owner, name: $repo) {
+//                     dependencyGraphManifests(first: 10, after: $after) {
+//                         nodes {
+//                             dependencies(first: 10) {
+//                                 nodes {
+//                                     packageName
+//                                     versionConstraint
+//                                 }
+//                                 pageInfo {
+//                                     hasNextPage
+//                                     endCursor
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+
+//         `
+// 		vars := map[string]interface{}{
+// 			"owner": githubv4.String(owner),
+// 			"repo":  githubv4.String(repo),
+// 			"after": githubv4.String(cursor),
+// 		}
+// 		req := graphql.NewRequest(query)
+// 		req.Var("owner", vars["owner"])
+// 		req.Var("repo", vars["repo"])
+// 		req.Var("after", vars["after"])
+
+// 		var data struct {
+// 			Repository struct {
+// 				DependencyGraphManifests struct {
+// 					Nodes []struct {
+// 						Dependencies models.DependencyConnection `graphql:"dependencies"`
+// 					} `graphql:"nodes"`
+// 				} `graphql:"dependencyGraphManifests"`
+// 			} `graphql:"repository(owner: $owner, name: $repo)"`
+// 		}
+
+// 		if err := client.Query(context.Background(), &data, vars); err != nil {
+// 			return nil
+// 		}
+
+// 		deps := data.Repository.DependencyGraphManifests.Nodes[0].Dependencies.Nodes
+// 		allDeps = append(allDeps, deps...)
+// 		count += 1
+// 		if !data.Repository.DependencyGraphManifests.Nodes[0].Dependencies.PageInfo.HasNextPage {
+// 			break
+// 		}
+// 		cursor = data.Repository.DependencyGraphManifests.Nodes[0].Dependencies.PageInfo.EndCursor
+// 	}
+// 	logger.Info(fmt.Sprintf("Dependency count: %d", count))
+// 	return allDeps
+// }
+
 func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) {
 
+	// getDependencies(client, repo.Owner, repo.Name, logger)
 	variables := map[string]interface{}{ // variables to dynamically populate the graphql query structure
 		"owner": githubv4.String(repo.Owner),
 		"name":  githubv4.String(repo.Name),
@@ -194,7 +257,7 @@ func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *mode
 		}
 	}
 
-	// logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
+	logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
 	// logger.Info(fmt.Sprintf("Version score: %f", repo.VersionScore))
 	// logger.Info(fmt.Sprintf("numNodes: %d", numNodes))
 

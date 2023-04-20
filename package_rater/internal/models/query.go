@@ -21,9 +21,12 @@ var Dependency struct {
 			Nodes      []struct {
 				Filename string `json:"filename"`
 			}
+			PageInfo struct {
+				EndCursor   string `json:"endCursor"`
+				HasNextPage bool   `json:"hasNextPage"`
+			} `json:"pageInfo"`
 			Edges []struct {
 				Node struct {
-					BlobPath     string `json:"blobPath"`
 					Dependencies struct {
 						TotalCount int `json:"dependencyCount"`
 						Nodes      []struct {
@@ -32,9 +35,30 @@ var Dependency struct {
 							HasDependencies bool   `json:"hasDependencies"`
 							PackageManager  string `json:"packageManager"`
 						}
-					}
+						PageInfo struct {
+							EndCursor   string `json:"endCursor"`
+							HasNextPage bool   `json:"hasNextPage"`
+						} `json:"pageInfo"`
+					} `graphql:"dependencies(first: 10)"`
 				}
 			}
 		}
 	} `graphql:"repository(owner: $owner, name: $name)"`
 }
+
+// type DependencyConnection struct {
+// 	Nodes    []Dependency `json:"nodes"`
+// 	PageInfo PageInfo     `json:"pageInfo"`
+// }
+
+// type Dependency struct {
+// 	Name       string `json:"name"`
+// 	Repository struct {
+// 		NameWithOwner string `json:"nameWithOwner"`
+// 	} `json:"repository"`
+// }
+
+// type PageInfo struct {
+// 	HasNextPage bool   `json:"hasNextPage"`
+// 	EndCursor   string `json:"endCursor"`
+// }
