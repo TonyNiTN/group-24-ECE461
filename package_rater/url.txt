@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 https://github.com/cloudinary/cloudinary_npm
 https://www.npmjs.com/package/express
 https://github.com/nullivex/nodist
 https://github.com/lodash/lodash
 https://www.npmjs.com/package/browserify
+=======
+>>>>>>> 10ddb96 (running but timeout error)
 https://github.com/facebook/react
