@@ -27,38 +27,23 @@ var Dependency struct {
 			} `json:"pageInfo"`
 			Edges []struct {
 				Node struct {
-					Dependencies struct {
-						TotalCount int `json:"dependencyCount"`
-						Nodes      []struct {
-							PackageName     string `json:"packageName"`
-							Requirements    string `json:"requirements"`
-							HasDependencies bool   `json:"hasDependencies"`
-							PackageManager  string `json:"packageManager"`
-						}
-						PageInfo struct {
-							EndCursor   string `json:"endCursor"`
-							HasNextPage bool   `json:"hasNextPage"`
-						} `json:"pageInfo"`
-					} `graphql:"dependencies(first: 10)"`
+					Dependencies DependenciesConnection `graphql:"dependencies(first: $first, after: $after)"`
 				}
 			}
 		}
 	} `graphql:"repository(owner: $owner, name: $name)"`
 }
 
-// type DependencyConnection struct {
-// 	Nodes    []Dependency `json:"nodes"`
-// 	PageInfo PageInfo     `json:"pageInfo"`
-// }
-
-// type Dependency struct {
-// 	Name       string `json:"name"`
-// 	Repository struct {
-// 		NameWithOwner string `json:"nameWithOwner"`
-// 	} `json:"repository"`
-// }
-
-// type PageInfo struct {
-// 	HasNextPage bool   `json:"hasNextPage"`
-// 	EndCursor   string `json:"endCursor"`
-// }
+type DependenciesConnection struct {
+	TotalCount int `json:"dependencyCount"`
+	Nodes      []struct {
+		PackageName     string `json:"packageName"`
+		Requirements    string `json:"requirements"`
+		HasDependencies bool   `json:"hasDependencies"`
+		PackageManager  string `json:"packageManager"`
+	}
+	PageInfo struct {
+		EndCursor   string `json:"endCursor"`
+		HasNextPage bool   `json:"hasNextPage"`
+	} `json:"pageInfo"`
+}
