@@ -55,3 +55,20 @@ type DependenciesConnection struct {
 		HasNextPage bool   `json:"hasNextPage"`
 	} `json:"pageInfo"`
 }
+
+// type DependencyConnection struct {
+// 	Nodes    []Dependency `json:"nodes"`
+// 	PageInfo PageInfo     `json:"pageInfo"`
+// }
+
+// type Dependency struct {
+// 	Name       string `json:"name"`
+// 	Repository struct {
+// 		NameWithOwner string `json:"nameWithOwner"`
+// 	} `json:"repository"`
+// }
+
+// type PageInfo struct {
+// 	HasNextPage bool   `json:"hasNextPage"`
+// 	EndCursor   string `json:"endCursor"`
+// }
