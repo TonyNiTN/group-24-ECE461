@@ -14,15 +14,10 @@ Provide POST functionality for the following endpoints:
 */
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/Masterminds/semver"
-	"github.com/golang-jwt/jwt"
-	"github.com/gorilla/mux"
-	"github.com/packit461/packit23/sql/models"
 	"io"
 	"log"
 	"net"
@@ -30,6 +25,12 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/storage"
+	"github.com/Masterminds/semver"
+	"github.com/golang-jwt/jwt"
+	"github.com/gorilla/mux"
+	"github.com/packit461/packit23/sql/models"
 
 	//"github.com/packit461/packit23/package_rater/internal/logger"
 
@@ -147,11 +148,11 @@ func getBucketObject(bucketName string, objectName string) ([]byte, error) {
 		return nil, fmt.Errorf("Object(%q).NewReader: %v", objectName, err)
 	}
 	defer rc.Close()
-	bucketObjet, err := io.ReadAll(rc)
+	bucketObject, err := io.ReadAll(rc)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll: %v", err)
 	}
-	return bucketObjet, nil
+	return bucketObject, nil
 }
 
 // return all versions of package name in db
@@ -244,62 +245,68 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-// Return this package (ID)
-// Get from the bucket
+// Return this package (ID) from google cloud bucket
 func handle_package_id(w http.ResponseWriter, r *http.Request) {
 	//db, err := connect()
 	db, err := connect_test_db()
 	if err != nil {
+		return_500_packet(w, r)
 		log.Print(err)
 	}
 	defer db.Close()
 
+	var meta models.PackageMetadata
+	var bucket_object_name string
+	var ret_package models.Package
 	vars := mux.Vars(r)
 	id := vars["id"]
+
 	if id == "" {
 		return_404_packet(w, r)
 		log.Print("Emppty {id} in path")
 	}
-	var meta models.PackageMetadata
+
 	rows, err := db.Query("SELECT ID, NAME, VERSION FROM Registry WHERE ID = " + id + ";")
 	if err != nil {
+		return_500_packet(w, r)
 		log.Print(err)
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		err = rows.Scan(&meta.ID, &meta.Name, &meta.Version)
 		if err != nil {
+			return_500_packet(w, r)
 			log.Print(err)
 		}
 	}
-	// res, err := db.Query(`BEGIN SELECT
-	// 						B.BINARY_FILE,
-	// 						A.URL
-	// 						B.JS_PROGRAM
-	// 						FROM Registry AS A
-	// 						WHERE A.ID == ?
-	// 						INNER JOIN Binaries AS B
-	// 							ON A.BINARY_PK == B.ID
-	// 						END;`, id)
-	// bucket name, object name
-	getBucketObject()
 
+	res, err := db.Query("SELECT RATING_PK FROM Registry WHERE ID = ?", id)
 	if err != nil {
+		return_500_packet(w, r)
 		log.Print(err)
 	}
 	defer res.Close()
-	var packData models.PackageData
-	// Need to append NULL for JSProgram
-	err = res.Scan(&packData.Content, &packData.URL, &packData.JSProgram)
+
+	// bucket object name is the same as the rating pk
+	for res.Next() {
+		err = res.Scan(&bucket_object_name)
+		if err != nil {
+			return_500_packet(w, r)
+			log.Print(err)
+		}
+	}
+	b64contents, err := getBucketObject(os.Getenv("BUCKET_NAME"), bucket_object_name)
 	if err != nil {
 		log.Print(err)
 	}
-	totalPack := models.PackageModel{Metadata: &meta, Data: &packData}
-	packJson, err := json.Marshal(totalPack)
-	if err != nil {
-		log.Print(err)
-	}
-	w.Write(packJson)
+
+	ret_package.Metadata = &meta
+	ret_package.Data.Content = string(b64contents)
+	ret_package.Data.URL = ""
+	ret_package.Data.JSProgram = ""
+
+	json.NewEncoder(w).Encode(ret_package)
 	w.WriteHeader(200)
 }
 
@@ -310,6 +317,7 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
+	var ratings models.PackageRating
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if id == "" {
@@ -317,12 +325,13 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		log.Print("id cannot be empty")
 	}
+
 	res, err := db.Query("SELECT A.BUS_FACTOR, A.CORRECTNESS, A.RAMP_UP, A.RESPONSIVENESS, A.LICENSE_SCORE, A.PINNING_PRACTICE, A.PULL_REQUEST, A.NET_SCORE FROM Ratings AS A INNER JOIN Registry AS B ON A.ID = B.RATING_PK WHERE B.ID = ?", id)
 	if err != nil {
 		return_400_packet(w, r)
 		log.Print(err)
 	}
-	var ratings models.PackageRating
+
 	for res.Next() {
 		err = res.Scan(&ratings.BusFactor, &ratings.Correctness, &ratings.RampUp, &ratings.ResponsiveMaintainer, &ratings.LicenseScore, &ratings.GoodPinningPractice, &ratings.PullRequest, &ratings.NetScore)
 		if err != nil {
@@ -330,12 +339,8 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 			log.Print(err)
 		}
 	}
-	ratingsJson, err := json.Marshal(ratings)
-	if err != nil {
-		return_500_packet(w, r)
-		log.Print(err)
-	}
-	w.Write(ratingsJson)
+
+	json.NewEncoder(w).Encode(ratings)
 	w.WriteHeader(200)
 }
 
@@ -348,14 +353,18 @@ func handle_package_byname(w http.ResponseWriter, r *http.Request) {
 		return_500_packet(w, r)
 		log.Print(err)
 	}
+	defer db.Close()
+
+	var ret []models.PackageHistoryEntry
+	var metadataList []models.PackageMetadata
+	var times []string
 	vars := mux.Vars(r)
 	name := vars["name"]
 	if name == "" {
 		return_404_packet(w, r)
+		log.Print("name cannot be empty")
 	}
-	var ret []models.PackageHistoryEntry
-	var metadataList []models.PackageMetadata
-	var times []string
+
 	// get registry entry from name
 	rows, err := db.Query("SELECT ID, NAME, VERSION, UPLOADED FROM Registry WHERE NAME = ?", name)
 	if err != nil {

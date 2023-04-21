@@ -77,6 +77,11 @@ type PackageModel struct {
 	Data *PackageData `json:"data"`
 }
 
+type Package struct {
+	Metadata *PackageMetadata `json:"metadata"`
+	Data     *PackageData     `json:"data"`
+}
+
 // Authentication info for a user
 type UserAuthenticationInfo struct {
 	// Password for a user. Per the spec, this should be a \"strong\" password.
