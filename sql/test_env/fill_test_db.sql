@@ -86,3 +86,85 @@ INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, U
 	'2023-04-14 02:20:20',
 	False
 );
+
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	3,
+	'package2-name',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.5.0',
+	'2023-04-14 02:20:20',
+	False
+);
+
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	3,
+	'package2-name',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.5.5',
+	'2023-04-14 02:20:20',
+	False
+);
+
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	4,
+	'package2-name',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.6.0',
+	'2023-04-14 02:20:20',
+	False
+);
+
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	6,
+	'newpackage',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.2.3',
+	'2023-04-14 02:20:20',
+	False
+);
+
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	7,
+	'newpackage',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.2.6',
+	'2023-04-14 02:20:20',
+	False
+);
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	8,
+	'newpackage',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'1.5.0',
+	'2023-04-14 02:20:20',
+	False
+);
+INSERT INTO Registry (ID, NAME, RATING_PK, AUTHOR_PK, URL, BINARY_PK, VERSION, UPLOADED, IS_EXTERNAL) VALUES (
+	9,
+	'newpackage',
+	2,
+	2, 
+	'github.com/19chonm/461_1_23',
+	2,
+	'2.1.0',
+	'2023-04-14 02:20:20',
+	False
+);
