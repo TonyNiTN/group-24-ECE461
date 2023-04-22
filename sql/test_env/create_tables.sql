@@ -1,45 +1,35 @@
-CREATE TABLE Users ( 
-	ID int, 
-	USERNAME varchar(50),
-	PASSWORD varchar(50),
-	TOKEN varchar(50),
-	TOKEN_CREATED datetime,
-	TOKEN_EXPIRY datetime,
-	PRIVILEGE_LEVEL int,
-	PRIMARY KEY (ID)
-);
-
--- missing BINARY_FILE
-CREATE TABLE Binaries (
-	ID int,
-	PRIMARY KEY (ID)
-);
-
-CREATE TABLE Ratings (
-	ID int,
-	BUS_FACTOR float,
-	CORRECTNESS float,
-	RAMP_UP float,
-	RESPONSIVENESS float,
-	LICENSE_SCORE float,
-	PINNING_PRACTICE float,
-	PULL_REQUEST float,
-	NET_SCORE float,
-	PRIMARY KEY (ID)
-);
-
-CREATE TABLE Registry (
-	ID int,
-	NAME varchar (50),
-	RATING_PK int,
-	AUTHOR_PK int, 
-	URL varchar(255),
-	BINARY_PK int,
-	VERSION varchar (15),
-	UPLOADED datetime,
-	IS_EXTERNAL boolean,
+CREATE TABLE packages (
+	id INT,
+	name VARCHAR (512) NOT NULL,
+	rating_pk INT NOT NULL,
+	author_pk INT NOT NULL, 
+	url VARCHAR(512) NOT NULL,
+	binary_pk INT NOT NULL,
+	version VARCHAR (512) NOT NULL,
+	uploaded_time DATETIME NOT NULL,
+	is_external BOOLEAN  NOT NULL,
 	PRIMARY KEY (ID),
 	FOREIGN KEY(RATING_PK) REFERENCES Ratings(ID),
 	FOREIGN KEY(AUTHOR_PK) REFERENCES Users(ID),
 	FOREIGN KEY(BINARY_PK) REFERENCES Binaries(ID)
+);
+
+CREATE TABLE users ( 
+	id INT, 
+	username VARCHAR(512) NOT NULL,
+	password BLOB NOT NULL,
+	PRIMARY KEY (ID)
+);
+
+CREATE TABLE ratings (
+	id INT,
+	busFactor FLOAT NOT NULL,
+	correctness FLOAT NOT NULL,
+	rampUp FLOAT NOT NULL,
+	responsiveMaintainer FLOAT NOT NULL,
+	licenseScore FLOAT NOT NULL,
+	goodPinningPractice FLOAT NOT NULL,
+	pullRequest FLOAT NOT NULL,
+	netScore FLOAT NOT NULL,
+	PRIMARY KEY (ID)
 );

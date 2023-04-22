@@ -52,6 +52,15 @@ type PackagesBody struct {
 	Items []PackageQuery
 }
 
+type PackageRegExBody struct {
+	RegEx string `json:"RegEx"`
+}
+
+type RegExReturn struct {
+	Version string `json:"Version"`
+	Name    string `json:"Name"`
+}
+
 // Package rating (cf. Project 1).  If the Project 1 that you inherited does not support one or more of the original properties, denote this with the value \"-1\".
 type PackageRating struct {
 	BusFactor float64 `json:"BusFactor"`
