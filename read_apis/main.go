@@ -5,9 +5,7 @@ Provide GET functionality for the following endpoints:
 /package/{id}
 /package/{id}/rate
 /package/byName/{name}
-*/
 
-/*
 Provide POST functionality for the following endpoints:
 /packages
 /package/byRegEx
