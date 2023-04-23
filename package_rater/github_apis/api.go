@@ -31,12 +31,6 @@ import (
 // License Compatibility: 1 If license, 0 otherwise (will use regex if need to search for a specific license) ;; using GraphQL API
 var flag int = 0
 
-// type DependenciesFactors struct {
-// 	Data struct {
-// 		Repository struct
-// 	}
-// }
-
 func SendRequests(client *github.Client, graphqlClient *githubv4.Client, ctx context.Context, graphqlCtx context.Context, repo *models.Repository, logger *zap.Logger, cache *cache.Cache) (f int) {
 	flag = 0
 
@@ -117,12 +111,6 @@ func CreateRESTClient() (*github.Client, context.Context) { // function to creat
 }
 
 func CreateGQLClient() (*githubv4.Client, context.Context) { // function to creategithub GraphQL api client
-	// ctx := context.Background() // create empty context
-	// cfg := config.NewConfig()
-	// ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
-	// tc := oauth2.NewClient(ctx, ts)                                             // create new http client
-	// graphqlClient := githubv4.NewClient(tc)                                     // create new github graphql api client from the http client template
-
 	ctx := context.Background() // create empty context
 	cfg := config.NewConfig()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.GithubToken}) // configure auth header for the client
@@ -160,8 +148,6 @@ func GetPullRequests(client *github.Client, ctx context.Context, repo *models.Re
 }
 
 func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *models.Repository, logger *zap.Logger, c *cache.Cache) {
-
-	// getDependencies(client, repo.Owner, repo.Name, logger)
 
 	variables := map[string]interface{}{ // variables to dynamically populate the graphql query structure
 		"owner": githubv4.String(repo.Owner),
@@ -208,25 +194,6 @@ func GetDependencyQuery(client *githubv4.Client, ctx context.Context, repo *mode
 			}
 		}
 	}
-
-	// numNodes := models.Dependency.Repository.DependencyGraphManifests.TotalCount
-	// numNodes := len(models.Dependency.Repository.DependencyGraphManifests.Nodes)
-
-	// edges := models.Dependency.Repository.DependencyGraphManifests.Edges
-	// re, _ := regexp.Compile(">|>=|<|<=|`^`")
-	// // logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
-	// for i := 0; i < numNodes; i++ {
-	// 	dependency := edges[i].Node.Dependencies
-	// 	repo.DependencyCount += dependency.TotalCount
-	// 	logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
-	// 	for j := 0; j < dependency.TotalCount; j++ {
-	// 		requirement := dependency.Nodes[j].Requirements
-	// 		matched := re.MatchString(requirement) // cases where major + minor version is NOT pinned
-	// 		if !matched {
-	// 			repo.PinnedVersions += 1
-	// 		}
-	// 	}
-	// }
 
 	logger.Info(fmt.Sprintf("Dependency count: %d", repo.DependencyCount))
 	// // logger.Info(fmt.Sprintf("Version score: %f", repo.VersionScore))
