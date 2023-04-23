@@ -23,7 +23,6 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/mux"
-	// "cloud.google.com/go/cloudsqlconn/mysql/mysql"
 )
 
 func verifyJWT(endpointHandler func(writer http.ResponseWriter, request *http.Request)) http.HandlerFunc {
