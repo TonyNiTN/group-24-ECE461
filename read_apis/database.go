@@ -12,7 +12,6 @@ import (
 	"cloud.google.com/go/cloudsqlconn"
 	"cloud.google.com/go/storage"
 	sql_driver "github.com/go-sql-driver/mysql"
-	"github.com/packit461/packit23/read_apis/models"
 )
 
 func connect_test_db() (*sql.DB, error) {
@@ -88,15 +87,15 @@ func getBucketObject(bucketName string, objectName string) ([]byte, error) {
 }
 
 // return all versions of package name in db
-func getMetadataFromName(db *sql.DB, name string) ([]models.PackageMetadata, error) {
-	var metadataList []models.PackageMetadata
+func getMetadataFromName(db *sql.DB, name string) ([]PackageMetadata, error) {
+	var metadataList []PackageMetadata
 	rows, err := db.Query("SELECT id, name, version FROM packages WHERE name = ?;", name)
 	if err != nil {
 		log.Print(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var md models.PackageMetadata
+		var md PackageMetadata
 		if err := rows.Scan(&md.ID, &md.Name, &md.Version); err != nil {
 			return nil, fmt.Errorf("version of package not found. rows.Scan: %v", err)
 		}
