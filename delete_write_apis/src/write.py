@@ -51,6 +51,7 @@ async def create_auth_token(request: Request):
     # Parsing to make sure valid request (Need to manually decode request to allow unicode characters)
     try:
         payload = await request.body()
+        helper.log("payload: ", payload)
         payloadDecoded = payload.decode("UTF-8")
         helper.log("payloadDecoded: ", payloadDecoded)
         parsed_body = json.loads(payloadDecoded, strict=False)
@@ -61,6 +62,7 @@ async def create_auth_token(request: Request):
         helper.log("password bytes1: ", bytes(password, encoding="UTF-8"))
         helper.log("password bytes2: ", bytes(password, encoding="raw_unicode_escape"))
         helper.log("password bytes3: ", bytes(password, encoding="unicode_escape"))
+        helper.log("payload: ", payload)
 
 
         # get_hashed_password is only ran by an administrator to add users by hand
