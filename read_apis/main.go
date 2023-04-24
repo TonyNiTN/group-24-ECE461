@@ -25,6 +25,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func print_req_info(r *http.Request) {
+	log.Print(r.Method, r.URL, r.Header, r.URL.Query(), r.URL.RawPath, r.Body)
+}
+
 func verifyJWT(endpointHandler func(writer http.ResponseWriter, request *http.Request)) http.HandlerFunc {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if request.Header["X-Authorization"] != nil {
@@ -39,12 +43,14 @@ func verifyJWT(endpointHandler func(writer http.ResponseWriter, request *http.Re
 			if err != nil {
 				log.Print("Error validating JWT")
 				return_400_packet(writer, request)
+				return
 			}
 			if token.Valid {
 				endpointHandler(writer, request)
 			} else {
 				log.Print("Error validating JWT")
 				return_400_packet(writer, request)
+				return
 			}
 		}
 	})
@@ -56,11 +62,13 @@ Missing:
 - Pagination
 */
 func handle_packages(w http.ResponseWriter, r *http.Request) {
-	//db, err := connect()
-	db, err := connect_test_db()
+	print_req_info(r)
+	db, err := connect()
+	//db, err := connect_test_db()
 	if err != nil {
 		log.Print(err)
 		return_500_packet(w, r)
+		return
 	}
 	defer db.Close()
 	// parse query for offset (pagination). if empty, return the first page of results
@@ -76,8 +84,9 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	var packages_metadata []PackageMetadata
 	err = json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		return_404_packet(w, r)
 		log.Print("\nError reading body of request\n")
+		return_404_packet(w, r)
+		return
 	}
 	for _, q := range body.Items {
 		response_arr = append(response_arr, PackageQuery{q.Name, q.Version})
@@ -92,22 +101,25 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 		}
 		c, err := semver.NewConstraint(response.Version)
 		if err != nil {
-			return_400_packet(w, r)
 			log.Print(err)
+			return_400_packet(w, r)
+			return
 		}
 
 		// query all versions of a package if found in db
 		metadataList, err := getMetadataFromName(db, response.Name)
 		if err != nil {
-			return_400_packet(w, r)
 			log.Print(err)
+			return_400_packet(w, r)
+			return
 		}
 		// check which version is in range
 		for _, md := range metadataList {
 			v, err := semver.NewVersion(md.Version)
 			if err != nil {
-				return_500_packet(w, r)
 				log.Print(err)
+				return_500_packet(w, r)
+				return
 			}
 			if c.Check(v) {
 				packages_metadata = append(packages_metadata, md)
@@ -116,7 +128,7 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if packages_metadata == nil {
-		return_400_packet(w, r)
+		log.Print("packages response is empty")
 	}
 	json.NewEncoder(w).Encode(packages_metadata)
 	return_200_packet(w, r)
@@ -124,44 +136,51 @@ func handle_packages(w http.ResponseWriter, r *http.Request) {
 
 // Return this package (ID) from google cloud bucket
 func handle_package_id(w http.ResponseWriter, r *http.Request) {
-	//db, err := connect()
-	db, err := connect_test_db()
+	print_req_info(r)
+	db, err := connect()
+	//db, err := connect_test_db()
 	if err != nil {
-		return_500_packet(w, r)
 		log.Print(err)
+		return_500_packet(w, r)
+		return
 	}
 	defer db.Close()
 
 	var meta PackageMetadata
 	var bucket_object_name string
 	var ret_package Package
+	var data PackageData
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	if id == "" {
+		log.Print("Empty {id} in path")
 		return_404_packet(w, r)
-		log.Print("Emppty {id} in path")
+		return
 	}
 
-	rows, err := db.Query("SELECT id, name, version FROM packages WHERE id = " + id + ";")
+	rows, err := db.Query("SELECT id, name, version FROM packages WHERE id = ?;", id)
 	if err != nil {
-		return_500_packet(w, r)
 		log.Print(err)
+		return_500_packet(w, r)
+		return
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&meta.ID, &meta.Name, &meta.Version)
 		if err != nil {
-			return_500_packet(w, r)
 			log.Print(err)
+			return_500_packet(w, r)
+			return
 		}
 	}
 
-	res, err := db.Query("SELECT rating_pk FROM packages WHERE id = ?", id)
+	res, err := db.Query("SELECT rating_pk FROM packages WHERE id = ?;", id)
 	if err != nil {
 		log.Print(err)
 		return_500_packet(w, r)
+		return
 	}
 	defer res.Close()
 
@@ -171,18 +190,22 @@ func handle_package_id(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Print(err)
 			return_500_packet(w, r)
+			return
 		}
 	}
+
 	b64contents, err := getBucketObject(os.Getenv("BUCKET_NAME"), bucket_object_name)
 	if err != nil {
 		log.Print(err)
 		return_500_packet(w, r)
+		return
 	}
 
+	data.Content = string(b64contents)
+	data.URL = ""
+	data.JSProgram = ""
 	ret_package.Metadata = &meta
-	ret_package.Data.Content = string(b64contents)
-	ret_package.Data.URL = ""
-	ret_package.Data.JSProgram = ""
+	ret_package.Data = &data
 
 	json.NewEncoder(w).Encode(ret_package)
 	return_200_packet(w, r)
@@ -190,10 +213,13 @@ func handle_package_id(w http.ResponseWriter, r *http.Request) {
 
 // Return the package rating with ID (id from path)
 func handle_package_rate(w http.ResponseWriter, r *http.Request) {
-	db, err := connect_test_db()
+	print_req_info(r)
+	db, err := connect()
+	//db, err := connect_test_db()
 	if err != nil {
 		log.Print(err)
 		return_500_packet(w, r)
+		return
 	}
 
 	var ratings PackageRating
@@ -201,14 +227,15 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	if id == "" {
 		log.Print("id cannot be empty")
-		w.WriteHeader(404)
 		return_404_packet(w, r)
+		return
 	}
 
-	res, err := db.Query("SELECT A.busFactor, A.correctness, A.rampUp, A.responsiveMaintainer, A.licenseScore, A.goodPinningPractice, A.pullRequest, A.netScore FROM ratings AS A INNER JOIN packages AS B ON A.id = B.rating_pk WHERE B.id = ?", id)
+	res, err := db.Query("SELECT A.busFactor, A.correctness, A.rampUp, A.responsiveMaintainer, A.licenseScore, A.goodPinningPractice, A.pullRequest, A.netScore FROM ratings AS A INNER JOIN packages AS B ON A.id = B.rating_pk WHERE B.id = ?;", id)
 	if err != nil {
 		log.Print(err)
 		return_400_packet(w, r)
+		return
 	}
 
 	for res.Next() {
@@ -216,6 +243,7 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Print(err)
 			return_400_packet(w, r)
+			return
 		}
 	}
 
@@ -227,10 +255,13 @@ func handle_package_rate(w http.ResponseWriter, r *http.Request) {
 // const mysqlFormat = "2006-01-02 15:04:05"
 // const timeFormat = "2006-01-02T15:04:05Z"
 func handle_package_byname(w http.ResponseWriter, r *http.Request) {
-	db, err := connect_test_db()
+	print_req_info(r)
+	db, err := connect()
+	//db, err := connect_test_db()
 	if err != nil {
-		return_500_packet(w, r)
 		log.Print(err)
+		return_500_packet(w, r)
+		return
 	}
 	defer db.Close()
 
@@ -240,16 +271,19 @@ func handle_package_byname(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 	if name == "" {
-		return_404_packet(w, r)
 		log.Print("name cannot be empty")
+		return_404_packet(w, r)
+		return
 	}
 
 	// get registry entry from name
-	rows, err := db.Query("SELECT id, name, version, uploaded_time FROM packages WHERE name = ?", name)
+	rows, err := db.Query("SELECT id, name, version, upload_time FROM packages WHERE name = ?;", name)
 	if err != nil {
-		return_500_packet(w, r)
 		log.Print(err)
+		return_500_packet(w, r)
+		return
 	}
+
 	defer rows.Close()
 	// get all versions of named package
 	for rows.Next() {
@@ -257,15 +291,20 @@ func handle_package_byname(w http.ResponseWriter, r *http.Request) {
 		var md PackageMetadata
 		if err := rows.Scan(&md.ID, &md.Name, &md.Version, &timevar); err != nil {
 			// package with name not found
+			log.Print(err)
 			return_500_packet(w, r)
-			//log.Fatal(err)
+			return
 		}
 		if err != nil {
+			log.Print(err)
 			return_500_packet(w, r)
+			return
 		}
-		t, err := time.Parse("2006-01-02 15:04:05", timevar)
+		t, err := time.Parse("2006-01-02T15:04:05Z", timevar)
 		if err != nil {
+			log.Print(err)
 			return_500_packet(w, r)
+			return
 		}
 		timevar = t.Format(time.RFC3339)
 		metadataList = append(metadataList, md)
@@ -278,7 +317,9 @@ func handle_package_byname(w http.ResponseWriter, r *http.Request) {
 		history.User = &User{Name: "test", IsAdmin: false}
 		history.Date, err = time.Parse("2006-01-02T15:04:05Z", times[i])
 		if err != nil {
+			log.Print(err)
 			return_500_packet(w, r)
+			return
 		}
 		history.PackageMetadata = &md
 		history.Action = "Uploaded"
@@ -291,10 +332,13 @@ func handle_package_byname(w http.ResponseWriter, r *http.Request) {
 
 // return a list of package metadata from package names that match the regex
 func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
-	db, err := connect_test_db()
+	print_req_info(r)
+	db, err := connect()
+	//db, err := connect_test_db()
 	if err != nil {
-		return_500_packet(w, r)
 		log.Print(err)
+		return_500_packet(w, r)
+		return
 	}
 	defer db.Close()
 
@@ -304,14 +348,17 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 	var listoflists [][]PackageMetadata
 	err = json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		return_404_packet(w, r)
 		log.Print("\nError reading body of request\n")
+		return_404_packet(w, r)
+		return
 	}
+
 	// for list of names that match regex, get metadata and append to list of metadata
 	rows, err := db.Query("SELECT id, name, version FROM packages WHERE name REGEXP ?;", body.RegEx)
 	if err != nil {
 		log.Print(err)
 		return_500_packet(w, r)
+		return
 	}
 	defer rows.Close()
 
@@ -321,6 +368,7 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 		if err := rows.Scan(&md.ID, &md.Name, &md.Version); err != nil {
 			log.Print(err)
 			return_500_packet(w, r)
+			return
 		}
 		for _, md_list := range listoflists {
 			// might need to check first iteration
@@ -336,6 +384,7 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Print("Error getting metadata from name")
 				return_500_packet(w, r)
+				return
 			}
 			listoflists = append(listoflists, mdl)
 		}
@@ -349,6 +398,7 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Print("Error creating semantic version")
 				return_413_packet(w, r)
+				return
 			}
 			sortedVersions = append(sortedVersions, sv)
 		}
@@ -376,12 +426,12 @@ func handle_package_byregex(w http.ResponseWriter, r *http.Request) {
 				ret.Version = begin.String() + "-" + end.String()
 				ret.Name = md_list[i].Name
 			} else if begin_split[1] != end_split[1] {
-				// for tilde range (major and minor must match ~ patch version can change):
-				ret.Version = "~" + begin.String()
+				// for caret range (only major must match, up to minor version can change):
+				ret.Version = "^" + begin.String()
 				ret.Name = md_list[i].Name
 			} else if begin_split[2] != end_split[2] {
-				// for caret range (only major must match ~ up to minor version can change):
-				ret.Version = "^" + begin.String()
+				// for tilde range (major and minor must match, patch version can change):
+				ret.Version = "~" + begin.String()
 				ret.Name = md_list[i].Name
 			}
 			retList = append(retList, ret)
