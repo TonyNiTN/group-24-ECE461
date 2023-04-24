@@ -14,6 +14,14 @@ var Stars struct { // graphql query structure to get stargazers count of a repos
 	} `graphql:"repository(owner: $owner, name: $name)"` // passing in owner and name for the repository to look for
 }
 
+var DependencyCheck struct {
+	Repository struct {
+		DependencyGraphManifests struct {
+			ExceedsMaxSize bool `json:"exceedsMaxSize"`
+		}
+	} `graphql:"repository(owner: $owner, name: $name)"`
+}
+
 var Dependency struct {
 	Repository struct {
 		DependencyGraphManifests struct {
@@ -21,20 +29,29 @@ var Dependency struct {
 			Nodes      []struct {
 				Filename string `json:"filename"`
 			}
+			PageInfo struct {
+				EndCursor   string `json:"endCursor"`
+				HasNextPage bool   `json:"hasNextPage"`
+			} `json:"pageInfo"`
 			Edges []struct {
 				Node struct {
-					BlobPath     string `json:"blobPath"`
-					Dependencies struct {
-						TotalCount int `json:"dependencyCount"`
-						Nodes      []struct {
-							PackageName     string `json:"packageName"`
-							Requirements    string `json:"requirements"`
-							HasDependencies bool   `json:"hasDependencies"`
-							PackageManager  string `json:"packageManager"`
-						}
-					}
+					Dependencies DependenciesConnection `graphql:"dependencies(first: $first, after: $after)"`
 				}
 			}
 		}
 	} `graphql:"repository(owner: $owner, name: $name)"`
+}
+
+type DependenciesConnection struct {
+	TotalCount int `json:"dependencyCount"`
+	Nodes      []struct {
+		PackageName     string `json:"packageName"`
+		Requirements    string `json:"requirements"`
+		HasDependencies bool   `json:"hasDependencies"`
+		PackageManager  string `json:"packageManager"`
+	}
+	PageInfo struct {
+		EndCursor   string `json:"endCursor"`
+		HasNextPage bool   `json:"hasNextPage"`
+	} `json:"pageInfo"`
 }
