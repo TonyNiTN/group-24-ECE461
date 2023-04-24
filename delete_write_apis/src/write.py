@@ -58,7 +58,10 @@ async def create_auth_token(request: Request):
         username = parsed_body["User"]["name"]
         password = parsed_body["Secret"]["password"]
         helper.log("password: ", password)
-        helper.log("password bytes: ", bytes(password))
+        helper.log("password bytes1: ", bytes(password, encoding="UTF-8"))
+        helper.log("password bytes2: ", bytes(password, encoding="raw_unicode_escape"))
+        helper.log("password bytes3: ", bytes(password, encoding="unicode_escape"))
+
 
         # get_hashed_password is only ran by an administrator to add users by hand
         # helper.log("New password:")
