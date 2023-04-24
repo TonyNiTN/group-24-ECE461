@@ -45,7 +45,7 @@ INSERT INTO ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, l
 
 -- Fill Registry table
 
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	1,
 	'package1-name',
 	1,
@@ -56,7 +56,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	2,
 	'package2-name',
 	2,
@@ -67,7 +67,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	3,
 	'package2-name',
 	2,
@@ -78,7 +78,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	3,
 	'package2-name',
 	2,
@@ -89,7 +89,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	4,
 	'package2-name',
 	2,
@@ -100,7 +100,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	6,
 	'newpackage',
 	2,
@@ -112,7 +112,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	False
 );
 
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	7,
 	'newpackage',
 	2,
@@ -123,7 +123,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	8,
 	'newpackage',
 	2,
@@ -134,7 +134,7 @@ INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, u
 	'2023-04-14 02:20:20',
 	False
 );
-INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, uploaded_time, is_external) VALUES (
+INSERT INTO packages (id, name, rating_pk, author_pk, url, binary_pk, version, upload_time, is_external) VALUES (
 	9,
 	'newpackage',
 	2,
