@@ -3,9 +3,33 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import PlainTextResponse
 
-from . import write, delete
+from starlette.middleware import Middleware
+from starlette_context import context, plugins
+from starlette_context.middleware import RawContextMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from . import write, delete, database
+
+# Add middleware to access requestid using "context.data"
+middleware = [
+    Middleware(
+        RawContextMiddleware,
+        plugins=(
+            plugins.RequestIdPlugin(),
+            plugins.CorrelationIdPlugin()
+        )
+    )
+]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Setup
+    database.setup_database()
+    yield
+    # Cleanup
+
+app = FastAPI(middleware=middleware, lifespan=lifespan)
 
 app.include_router(delete.router)
 app.include_router(write.router)
@@ -17,6 +41,10 @@ app.include_router(write.router)
 def validation_exception_handler(request, exc):
     return PlainTextResponse(str(exc), status_code=400)
 
+# Return errors as plain text
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 @app.get("/")
 def read_root():

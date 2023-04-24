@@ -7,6 +7,28 @@ import tempfile
 import zipfile
 from git import Repo
 from urllib.parse import urlparse
+from starlette_context import context
+from starlette_context.header_keys import HeaderKeys
+from fastapi import Request
+
+async def log_request(request: Request):
+    statements = ["|Method:", request.method,
+                  "|URL:", request.url,
+                  "|Headers:", request.headers,
+                  "|Query params:", request.query_params,
+                  "|Path params:", request.path_params,
+                  "|Client:", request.client,
+                  "|Body:", await request.body()
+    ]
+    log(*statements)
+
+def log(*args, **kwargs):
+    # Same a print, but attach the request id beforehand
+    if context.exists():
+        header = f"[{context.data.get(HeaderKeys.request_id)}]"
+    else:
+        header = f"[Container-Startup]"
+    print(*((header,) + args), **kwargs)
 
 def zipitem(path, ziph):
     # ziph is zipfile handle
@@ -34,6 +56,7 @@ def downloadGithubRepo(url: str):
             return base64.b64encode(b)
 
 def checkGithubUrl(url: str) -> bool:
+    log(f"checkGithubUrl: {url}")
     parsed_uri = urlparse(url)
     if parsed_uri.netloc == "github.com":
         return True
@@ -49,8 +72,8 @@ def grabPackageDataFromZip(fileContents: str) -> tuple[str, str, str]:
         with open(dirPath + "/package.json") as file:
             package_data = json.load(file)
             return package_data["name"], package_data["version"], package_data["homepage"]
-            # print(package_data["homepage"])
-            # print(package_data["repository"]["url"])
+            # helper.log(package_data["homepage"])
+            # helper.log(package_data["repository"]["url"])
 
 # def convertZipToBase64(filePath: str):
 #     # Utility function only, used to generate test data
@@ -59,7 +82,7 @@ def grabPackageDataFromZip(fileContents: str) -> tuple[str, str, str]:
 #     with open(filePath, 'rb') as f:
 #         b = f.read()
 #         encoded = base64.b64encode(b)
-#         print(encoded)
+#         helper.log(encoded)
 
 def getOwnerAndRepoFromURL(url: str) -> tuple[str, str]:
     # Returns owner, repo from URL
@@ -93,4 +116,4 @@ def grabPackageDataFromRequest(parsed_body):
 
 # with open("/Users/ben/code/packit23/delete_write_apis/tests/example_b64.txt", "r") as file:
 #     x = grabUrl(file.read())
-#     print(x)
+#     helper.log(x)
