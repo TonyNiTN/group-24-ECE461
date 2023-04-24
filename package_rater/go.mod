@@ -3,17 +3,11 @@ module github.com/packit461/packit23/package_rater
 go 1.19
 
 require (
-	cloud.google.com/go/cloudsqlconn v1.2.3
-	github.com/go-sql-driver/mysql v1.7.0
 	github.com/google/go-github v17.0.0+incompatible
-<<<<<<< Updated upstream:package_rater/go.mod
-=======
-	github.com/packit461/packit23/package_rater v0.0.0-20230407011155-fd1491755576
->>>>>>> Stashed changes:go.mod
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/shurcooL/githubv4 v0.0.0-20221229060216-a8d4a561cc93
 	go.uber.org/zap v1.24.0
-	golang.org/x/oauth2 v0.7.0
+	golang.org/x/oauth2 v0.4.0
 )
 
 require (

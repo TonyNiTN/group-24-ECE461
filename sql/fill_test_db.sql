@@ -2,14 +2,14 @@
 -- what does privilege level look like?
 
 -- user with valid token
-INSERT INTO Users (id, username, password) VALUES (
+INSERT INTO users (id, username, password) VALUES (
     1, 
     'valid-user',
     'strongpassword'
 );
 
 -- user with expired token
-INSERT INTO Users (id, username, password) VALUES (
+INSERT INTO users (id, username, password) VALUES (
     2, 
     'invalid-user',
     'strongpassword'
@@ -18,7 +18,7 @@ INSERT INTO Users (id, username, password) VALUES (
 -- Fill Ratings table
 
 -- Good rating
-INSERT INTO Ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, licenseScore, goodPinningPractice, pullRequest, netScore) VALUES (
+INSERT INTO ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, licenseScore, goodPinningPractice, pullRequest, netScore) VALUES (
 	1,
 	1.0,
     1.0,
@@ -31,7 +31,7 @@ INSERT INTO Ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, l
 );
 
 -- Bad rating
-INSERT INTO Ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, licenseScore, goodPinningPractice, pullRequest, netScore) VALUES (
+INSERT INTO ratings (id, busFactor, correctness, rampUp, responsiveMaintainer, licenseScore, goodPinningPractice, pullRequest, netScore) VALUES (
 	2,
 	0.0,
     0.0,
