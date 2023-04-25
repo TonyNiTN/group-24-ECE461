@@ -112,8 +112,11 @@ async def package_create(request: Request) -> Union[None, Package]:
         helper.log("parsed_body: ", parsed_body)
 
         # On package upload, either Content or URL should be set.
-        assert ("Content" in parsed_body) or ("URL" in parsed_body) # At least one should be set
-        assert not ( ("Content" in parsed_body) and ("URL" in parsed_body) ) # Both shouldn't be set
+        contentSet = ("Content" in parsed_body) and parsed_body["Content"] != None
+        urlSet = ("URL" in parsed_body) and parsed_body["URL"] != None
+        helper.log("contentSet, urlSet: ", contentSet, urlSet)
+        assert contentSet or urlSet # At least one should be set
+        assert not ( contentSet and urlSet ) # Both shouldn't be set
     except Exception:
         helper.log(f"There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid: {traceback.format_exc()}")
         raise HTTPException(status_code=400, detail="There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.")

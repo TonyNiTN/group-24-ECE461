@@ -69,6 +69,7 @@ def grabPackageDataFromZip(fileContents: str) -> tuple[str, str, str]:
 
     with tempfile.TemporaryDirectory() as dirPath:
         zf.extractall(dirPath)
+        log("Extracted contents", os.listdir(dirPath))
         with open(dirPath + "/package.json") as file:
             package_data = json.load(file)
             return package_data["name"], package_data["version"], package_data["homepage"]
