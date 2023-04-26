@@ -56,10 +56,23 @@
 <body>
     <div class="container">
         &nbsp;
-        <h2>Upload</h2>
-        <p id="errMsg" style="color:red; display: none">Your Package has missing fields</p>
+        <p>Upload using one of the below forms, either with just the URL, or with detailed package info</p>
+        <!-- <h2>Upload</h2> -->
+        <p id="errURLMsg" style="color:red; display: none">No URL entered</p>
+        <p id="errZipMsg" style="color:red; display: none">Your Package has missing fields</p>
         <p id="errPermsMsg" style="color:red; display: none">You do not have permission to upload packages</p>
         <form>
+            <h4>Upload By URL</h3>
+            <div class="mb-3">
+                <label for="formURL" class="form-label">URL</label>
+                <input type="text" class="form-control" id="formURL" placeholder="">
+            </div>
+        </form>
+        <button id="formSubmitURL" onclick="checkURLSubmission()" class="btn btn-primary">Submit</button>
+        <br>
+        <hr>
+        <form>
+            <h4>Upload By Info</h3>
             <div class="mb-3">
                 <label for="formPackageName" class="form-label">Package Name</label>
                 <input type="text" class="form-control" id="formPackageName" placeholder="">
@@ -68,10 +81,10 @@
                 <label for="formVersionNo" class="form-label">Version No.</label>
                 <input type="text" class="form-control" id="formVersionNo" placeholder="">
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="formURL" class="form-label">URL</label>
                 <input type="text" class="form-control" id="formURL" placeholder="">
-            </div>
+            </div> -->
             <!-- Check here -->
             <!-- <div class="mb-3">
                     <div class="form-check">
@@ -96,7 +109,7 @@
                     <textarea class="form-control" id="formUploadNOtes" rows="3"></textarea>
                 </div> -->
         </form>
-        <button id="formSubmit" onclick="checkPackage()" class="btn btn-primary">Submit</button>
+        <button id="formSubmitZip" onclick="checkPackage()" class="btn btn-primary">Submit</button>
     </div>
 </body>
 <footer-component></footer-component>

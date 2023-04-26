@@ -1,6 +1,6 @@
 // import { endpointPackage, xAuth } from 'overarching.js';
 const uploadAPICall = "https://good-spec-d4rgapcc.uc.gateway.dev/package";
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI0NjQzNzUsIm5iZiI6MTY4MjI5MTU3NSwiaXNzIjoicGFja2l0MjMiLCJhdWQiOiJwYWNraXQyMyIsImlhdCI6MTY4MjI5MTU3NSwic3ViIjoyfQ.3ylcJEBWlwAFXiCaX1TTQ3c0INYuy_bOQMCXyOQH1hs";
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI2NDk0MDUsIm5iZiI6MTY4MjQ3NjYwNSwiaXNzIjoicGFja2l0MjMiLCJhdWQiOiJwYWNraXQyMyIsImlhdCI6MTY4MjQ3NjYwNSwic3ViIjoxfQ.mo04vigHZ9seVWUYbxNp_P5mMJZRQpeDRrd7gtwtwPg";
 // const packageData = {
 //     id,
 //     packagename,
@@ -42,23 +42,38 @@ const errMsg = document.getElementById("errMsg");
 //     }
 // }
 
+/*********************************************************************************
+{
+"Content": "string",
+"URL": "string",
+"JSProgram": "string"
+}
+*********************************************************************************/
 async function submitPackageByURL(inputUrl) {
-    try {
-        const response = await fetch(uploadAPICall, {
-            method: 'POST',
-            headers: {
-                'X-Authorization': token
-            },
-            body: {
-                'URL': inputUrl
-            }
-        });
-        const json = await response.json();
-        console.log(json);
-    } catch (error) {
-        console.error('Error:', error);
+    const response = await fetch(uploadAPICall, {
+        mode: 'no-cors',
+        method: 'POST',
+        headers: {
+            'X-Authorization': token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'URL': inputUrl
+        })
+    })
+    .catch(error => console.log(error));
+    // const json = await response.json();
+    // console.log(json);
+    console.log('end of submit by URL');
+}
+
+function checkURLSubmission() {
+    if (formURL.value == "") {
+        console.log("empty URL upload");
+        errURLMsg.style.display = "block";
+    } else {
+        submitPackageByURL(formURL.value); 
     }
-    console.log('something');
 }
 
 function checkPackage() {
